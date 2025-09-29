@@ -46,7 +46,7 @@ Memória Persistente: Um "Diário de Logs" no Supabase que registra as interaç�
 O Rosto (Interface): Um painel de controle interativo para gerenciar e interagir com os Gems. </div>
 
 <h3 align= "center"> Tecnologias Utilizadas </h3>
-<div align= "left">
+<div align= "justify">
   
 -   **Linguagem Principal:** ![Python](https://img.shields.io/badge/Python-556B2F?style=for-the-badge&logo=python&logoColor=white)
 -   **Backend:** ![FastAPI](https://img.shields.io/badge/FastAPI-556B2F?style=for-the-badge&logo=fastapi&logoColor=white)
