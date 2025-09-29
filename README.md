@@ -6,14 +6,14 @@ Onde tecnologia e sustentabilidade se encontram. Este repositório é o coraçã
 </div>
 
 <p align="center">
-<img src="https://img.shields.io/badge/Status-Em%20Desenvolvimento-blue" alt="Status do Projeto">
-<img src="https://img.shields.io/badge/Linguagem-Python-3776AB?logo=python&logoColor=white" alt="Linguagem Principal">
-<img src="https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi&logoColor=white" alt="Backend">
-<img src="https://img.shields.io/badge/Database-Supabase-3ECF8E?logo=supabase&logoColor=white" alt="Database">
-<img src="https://img.shields.io/badge/AI-Google%20Gemini-8952FF?logo=google&logoColor=white" alt="IA Generativa">
-<a href="https://www.google.com/search?q=LICENSE">
-<img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="Licença">
-</a>
+  <img src="https://img.shields.io/badge/Status-Em%20Desenvolvimento-778899" alt="Status do Projeto">
+  <img src="https://img.shields.io/badge/Linguagem-Python-556B2F?logo=python&logoColor=white" alt="Linguagem Principal">
+  <img src="https://img.shields.io/badge/Backend-FastAPI-556B2F?logo=fastapi&logoColor=white" alt="Backend">
+  <img src="https://img.shields.io/badge/Database-Supabase-A0522D?logo=supabase&logoColor=white" alt="Database">
+  <img src="https://img.shields.io/badge/AI-Google%20Gemini-C46210?logo=google&logoColor=white" alt="IA Generativa">
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="Licença">
+  </a>
 </p>
 
 <p align="center">
@@ -46,21 +46,17 @@ Memória Persistente: Um "Diário de Logs" no Supabase que registra as interaç�
 O Rosto (Interface): Um painel de controle interativo para gerenciar e interagir com os Gems. </div>
 
 <h3 align= "center"> Tecnologias Utilizadas </h3>
-<div align= "center">Linguagem Principal: Python
-
-Backend: FastAPI
-
-IA Generativa: API do Google Gemini
-
-Banco de Dados e memória: Supabase
-
-Interface (Prototipagem): Streamlit/Lovable
-
-Base de Conhecimento: LangChain / LlamaIndex
-
-Hospedagem: Render
-
-Versionamento: GIt & GitHub</div>
+<div align= "left">
+  
+-   **Linguagem Principal:** ![Python](https://img.shields.io/badge/Python-556B2F?style=for-the-badge&logo=python&logoColor=white)
+-   **Backend:** ![FastAPI](https://img.shields.io/badge/FastAPI-556B2F?style=for-the-badge&logo=fastapi&logoColor=white)
+-   **IA Generativa:** ![Google Gemini](https://img.shields.io/badge/Google%20Gemini-C46210?style=for-the-badge&logo=google&logoColor=white)
+-   **Banco de Dados & Memória:** ![Supabase](https://img.shields.io/badge/Supabase-A0522D?style=for-the-badge&logo=supabase&logoColor=white)
+-   **Interface (Prototipagem):** ![Streamlit](https://img.shields.io/badge/Streamlit-C46210?style=for-the-badge&logo=streamlit&logoColor=white) & **Lovable**
+-   **Base de Conhecimento (RAG):** ![LangChain](https://img.shields.io/badge/LangChain-556B2F?style=for-the-badge&logo=langchain&logoColor=white)
+-   **Hospedagem:** ![Hostinger](https://img.shields.io/badge/Hostinger-A0522D?style=for-the-badge&logo=hostinger&logoColor=white)
+-   **Versionamento:** ![Git](https://img.shields.io/badge/Git-778899?style=for-the-badge&logo=git&logoColor=white) & ![GitHub](https://img.shields.io/badge/GitHub-778899?style=for-the-badge&logo=github&logoColor=white)
+-   **Automação (CI/CD):** ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-778899?style=for-the-badge&logo=githubactions&logoColor=white)</div>
 
 <h3 align= "center"> 📁 Estrutura do Repositório </h3>
 
@@ -103,12 +99,13 @@ pip install -r requirements.txt
 
 <h3 align= "center">  Contato </h3>
 <div align="center">
-<p> Lídi Moura </p>
-
-<a href="https://www.linkedin.com/in/lidimoura/">
-<img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
-</a>
-<a href="https://github.com/lidimoura">
-<img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
-</a>
-</div>
+<p align="center">
+  **Lidi Moura**
+  <br>
+  <a href="https://www.linkedin.com/in/lidimoura/">
+    <img src="https://img.shields.io/badge/LinkedIn-6699CC?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
+  </a>
+  <a href="https://github.com/lidimoura">
+    <img src="https://img.shields.io/badge/GitHub-778899?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+  </a>
+</p>
