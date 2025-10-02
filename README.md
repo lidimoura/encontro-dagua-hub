@@ -62,15 +62,15 @@ O Rosto (Interface): Um painel de controle interativo para gerenciar e interagir
 
 ```bash
 /encontro-dagua-hub
-  ├── 📂 api_backend/       # Código da API principal em FastAPI
-  ├── 📂 assets/            # Imagens, logos e animações do projeto
-  ├── 📂 interface/         # Código do frontend
-  ├── 📂 knowledge_base/    # Documentos para o RAG
-  ├── 📂 scripts/           # Scripts úteis e de automação
-  ├── 📂 specs/             # O "DNA" de cada Gem (blueprints)
-  ├── 📄 .gitignore        # Define o que o Git deve ignorar
-  ├── 📄 LICENSE           # Licença MIT
-  └── 📄 README.md         # Este arquivo :)
+  ├── 📂 api_backend/       
+  ├── 📂 assets/            
+  ├── 📂 interface/       
+  ├── 📂 conhecimento_base/    
+  ├── 📂 scripts/           
+  ├── 📂 specs/             
+  ├── 📄 .gitignore       
+  ├── 📄 LICENSE           
+  └── 📄 README.md         
   ```
 
 <h3 align= "center"> Como Começar </h3>
