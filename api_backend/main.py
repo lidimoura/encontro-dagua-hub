@@ -63,7 +63,7 @@ class QueryRequest(BaseModel):
     pergunta: str
 
 # Criando a cadeia de RAG
-llm = GoogleGenerativeAI(model="gemini-1.0-pro")
+llm = GoogleGenerativeAI(model="models/gemini-flash-latest")
 retriever = vector_store.as_retriever()
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
