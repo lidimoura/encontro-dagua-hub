@@ -10,9 +10,10 @@ COPY api_backend/requirements.txt .
 # Etapa 4: Instalando os Ingredientes
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Etapa 5: Copiando o Código e o Conhecimento (CORRIGIDO)
+# Etapa 5: Copiando o Código, Conhecimento e as Receitas (CORRIGIDO)
 COPY ./api_backend .
 COPY ./base_conhecimento ./base_conhecimento
+COPY ./specs ./specs  # <-- A LINHA QUE FALTAVA PARA COPIAR AS "RECEITAS"
 
 # Etapa 6: A Porta
 EXPOSE 8080

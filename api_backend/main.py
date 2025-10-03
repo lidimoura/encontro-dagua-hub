@@ -45,7 +45,7 @@ class QueryRequest(BaseModel):
 def invoke_gem(gem_id: str, request: QueryRequest):
     print(f"Recebido pedido para o Gem: {gem_id}")
 
-    caminho_da_receita = f"../specs/{gem_id}.md"
+    caminho_da_receita = f"specs/{gem_id}.md"
 
     try:
         with open(caminho_da_receita, 'r', encoding='utf-8') as f:
