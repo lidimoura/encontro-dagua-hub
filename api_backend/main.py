@@ -1,103 +1,79 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import google.generativeai as genai
 
-# Importações do LangChain
 from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
 from langchain_google_genai import GoogleGenerativeAI
+from langchain.prompts import PromptTemplate
 
-# --- CARREGAMENTO E CONFIGURAÇÃO INICIAL (O CORAÇÃO DO NOSSO RAG) ---
+# --- CONFIGURAÇÃO INICIAL ---
+# (Tenta carregar a chave de API do ambiente do Cloud Run)
+api_key = os.getenv("GOOGLE_API_KEY")
+if api_key:
+    genai.configure(api_key=api_key)
+else:
+    print("⚠️ Chave de API não encontrada. O deploy pode falhar.")
 
-# Carregando a chave de API do ambiente 
-def configurar_api_key():
-    """Carrega a chave da API a partir de variáveis de ambiente ou Colab Secrets."""
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if api_key:
-        print("🔑 Chave de API carregada das variáveis de ambiente.")
-        genai.configure(api_key=api_key)
-        return
-
-    try:
-        from google.colab import userdata
-        api_key = userdata.get('GOOGLE_API_KEY')
-        genai.configure(api_key=api_key)
-        print("🔑 Chave de API carregada do Colab Secrets.")
-    except (ImportError, KeyError):
-        raise ValueError("ERRO CRÍTICO: GOOGLE_API_KEY não encontrada. Configure-a como variável de ambiente.")
-
-configurar_api_key()
-
-# Caminho para nossa base de conhecimento (CORRIGIDO)
-CAMINHO_BASE_CONHECIMENTO = "base_conhecimento/stack_atual.md"
-
-# Esta função carrega e prepara nosso "índice de fichas" (Vector Store)
+# --- CARREGAMENTO DO RAG (BASE DE CONHECIMENTO) ---
 def carregar_vector_store():
-    print("Carregando base de conhecimento...")
-    with open(CAMINHO_BASE_CONHECIMENTO, 'r', encoding='utf-8') as f:
-        conteudo_documento = f.read()
-    
-    print("Dividindo o documento em chunks...")
+    caminho_base = "base_conhecimento/stack_atual.md"
+    with open(caminho_base, 'r', encoding='utf-8') as f:
+        conteudo = f.read()
+
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-    text_chunks = text_splitter.split_text(conteudo_documento)
-    
-    print("Criando embeddings e o vector store...")
+    chunks = text_splitter.split_text(conteudo)
+
     embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-    vector_store = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
-    print("✅ Vector Store pronto!")
+    vector_store = FAISS.from_texts(texts=chunks, embedding=embeddings)
     return vector_store
 
-# Carregamos o vector store UMA VEZ quando a API inicia
 vector_store = carregar_vector_store()
+retriever = vector_store.as_retriever()
+llm = GoogleGenerativeAI(model="models/gemini-flash-latest")
 
-# --- DEFINIÇÃO DA API E SEUS ENDPOINTS ---
-
-# Criando a aplicação FastAPI
+# --- API "GEM GERENTE" ---
 app = FastAPI(title="Encontro D'Água Hub API")
 
-# Definindo o formato da pergunta que vamos receber
 class QueryRequest(BaseModel):
     pergunta: str
 
-# Criando a cadeia de RAG
-llm = GoogleGenerativeAI(model="models/gemini-flash-latest")
-retriever = vector_store.as_retriever()
-qa_chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=retriever,
-)
+@app.post("/invoke_gem/{gem_id}")
+def invoke_gem(gem_id: str, request: QueryRequest):
+    print(f"Recebido pedido para o Gem: {gem_id}")
 
-# Endpoint principal para fazer perguntas
-@app.post("/ask_gem_tecnico")
-def ask_question(request: QueryRequest):
-    """
-    Recebe uma pergunta e retorna a resposta do Gem Guia Técnico.
-    """
-    print(f"Recebida a pergunta: {request.pergunta}")
-    
-    # Invoca nosso Gem para obter a resposta
+    caminho_da_receita = f"../specs/{gem_id}.md"
+
+    try:
+        with open(caminho_da_receita, 'r', encoding='utf-8') as f:
+            dna_do_gem = f.read()
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Gem com id '{gem_id}' não encontrado.")
+
+    prompt_template = dna_do_gem + """
+
+    Contexto: {context}
+    Pergunta: {question}
+
+    Sua Resposta:"""
+
+    QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt_template)
+
+    qa_chain = RetrievalQA.from_chain_type(
+        llm=llm,
+        chain_type="stuff",
+        retriever=retriever,
+        return_source_documents=True,
+        chain_type_kwargs={"prompt": QA_CHAIN_PROMPT}
+    )
+
     resultado = qa_chain.invoke({"query": request.pergunta})
-    
-    print(f"Resposta gerada: {resultado['result']}")
-    return {"resposta": resultado["result"]}
 
-# Endpoint de "saúde" para verificar se a API está no ar
+    return {"resposta": resultado["result"], "fontes": [doc.page_content for doc in resultado["source_documents"]]}
+
 @app.get("/")
 def health_check():
-    return {"status": "API do Encontro D'Água Hub está no ar!"}
-
-# --- BLOCO PARA EXECUÇÃO (PARA DEPLOY NO CLOUD RUN) ---
-
-if __name__ == "__main__":
-    import uvicorn
-
-    # O Cloud Run define a variável de ambiente PORT. Usamos ela ou o padrão 8080.
-    port = int(os.environ.get("PORT", 8080))
-    
-    # Rodamos o servidor Uvicorn. O host '0.0.0.0' é crucial para que o 
-    # contêiner aceite conexões externas.
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    return {"status": "API do Encontro D'Água Hub (v2.0 Gerente) está no ar!"}
