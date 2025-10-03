@@ -28,8 +28,8 @@ else:
     print("🔑 Chave de API carregada das variáveis de ambiente.")
 
 
-# Caminho para nossa base de conhecimento
-CAMINHO_BASE_CONHECIMENTO = "../base_conhecimento/stack_atual.md"
+# Caminho para nossa base de conhecimento (CORRIGIDO)
+CAMINHO_BASE_CONHECIMENTO = "base_conhecimento/stack_atual.md"
 
 # Esta função carrega e prepara nosso "índice de fichas" (Vector Store)
 def carregar_vector_store():
