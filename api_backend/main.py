@@ -13,20 +13,23 @@ from langchain_google_genai import GoogleGenerativeAI
 # --- CARREGAMENTO E CONFIGURAÇÃO INICIAL (O CORAÇÃO DO NOSSO RAG) ---
 
 # Carregando a chave de API do ambiente 
-api_key = os.getenv("GOOGLE_API_KEY")
-if not api_key:
-    # Para esse protótipo, vamos tentar pegar do Colab Secrets se a variável de ambiente não existir
+def configurar_api_key():
+    """Carrega a chave da API a partir de variáveis de ambiente ou Colab Secrets."""
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if api_key:
+        print("🔑 Chave de API carregada das variáveis de ambiente.")
+        genai.configure(api_key=api_key)
+        return
+
     try:
         from google.colab import userdata
         api_key = userdata.get('GOOGLE_API_KEY')
         genai.configure(api_key=api_key)
         print("🔑 Chave de API carregada do Colab Secrets.")
     except (ImportError, KeyError):
-        print("⚠️ Chave de API não encontrada. Configure no Colab Secrets ou como variável de ambiente.")
-else:
-    genai.configure(api_key=api_key)
-    print("🔑 Chave de API carregada das variáveis de ambiente.")
+        raise ValueError("ERRO CRÍTICO: GOOGLE_API_KEY não encontrada. Configure-a como variável de ambiente.")
 
+configurar_api_key()
 
 # Caminho para nossa base de conhecimento (CORRIGIDO)
 CAMINHO_BASE_CONHECIMENTO = "base_conhecimento/stack_atual.md"
@@ -86,3 +89,15 @@ def ask_question(request: QueryRequest):
 @app.get("/")
 def health_check():
     return {"status": "API do Encontro D'Água Hub está no ar!"}
+
+# --- BLOCO PARA EXECUÇÃO (PARA DEPLOY NO CLOUD RUN) ---
+
+if __name__ == "__main__":
+    import uvicorn
+
+    # O Cloud Run define a variável de ambiente PORT. Usamos ela ou o padrão 8080.
+    port = int(os.environ.get("PORT", 8080))
+    
+    # Rodamos o servidor Uvicorn. O host '0.0.0.0' é crucial para que o 
+    # contêiner aceite conexões externas.
+    uvicorn.run(app, host="0.0.0.0", port=port)
