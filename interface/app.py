@@ -106,7 +106,8 @@ if prompt := st.chat_input("Sua mensagem:"):
 
                 if supabase:
                     try:
-                        supabase.table('gem_logs').update({"resumo_resposta_gem": resposta_gem}).eq("pergunta_usuario", prompt).order('created_at', desc=True).limit(1).execute()
+                        # A forma correta de atualizar a linha mais recente que corresponde à pergunta
+                        supabase.table('gem_logs').update({"resumo_resposta_gem": resposta_gem}).eq("pergunta_usuario", prompt).is_("resumo_resposta_gem", "null").execute()
                     except Exception as e:
                         st.error(f"Erro ao atualizar resposta no Supabase: {e}")
 
