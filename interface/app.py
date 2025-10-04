@@ -1,6 +1,29 @@
 import streamlit as st
 import requests
 import json
+from supabase import create_client, Client
+import os
+
+# --- PAINEL DE DEBUG (Temporário) ---
+with st.expander("🕵️‍♀️ Painel de Detetive de Segredos"):
+    st.write("Verificando se os segredos do Supabase foram carregados do ambiente do Streamlit Cloud:")
+
+    # Pega os valores dos segredos
+    url_secret = st.secrets.get("SUPABASE_URL")
+    key_secret = st.secrets.get("SUPABASE_KEY")
+
+    # Verifica e exibe o status
+    if url_secret:
+        st.success("✅ Segredo SUPABASE_URL encontrado!")
+    else:
+        st.error("❌ ERRO: Segredo SUPABASE_URL NÃO encontrado!")
+
+    if key_secret:
+        st.success("✅ Segredo SUPABASE_KEY encontrado!")
+    else:
+        st.error("❌ ERRO: Segredo SUPABASE_KEY NÃO encontrado!")
+
+# --- O RESTO DO CÓDIGO CONTINUA IGUAL ---
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(
@@ -9,48 +32,83 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- CABEÇALHO ---
-st.title("💧 Painel de Comando do Encontro D'Água Hub")
-st.caption("Converse com sua equipe de Gems especialistas.")
+# --- CONEXÃO COM O SUPABASE ---
+SUPABASE_URL = st.secrets.get("SUPABASE_URL")
+SUPABASE_KEY = st.secrets.get("SUPABASE_KEY")
 
-# --- URL BASE DA NOSSA API NO CLOUD RUN ---
+supabase: Client = None
+if SUPABASE_URL and SUPABASE_KEY:
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# --- CABEÇALHO E URL DA API ---
+st.title("💧 Painel de Comando do Encontro D'Água Hub")
 API_BASE_URL = "https://encontro-dagua-hub-api-192934687919.southamerica-east1.run.app"
 
-# --- BARRA LATERAL PARA SELEÇÃO DE GEMS (MUDANÇA 2 e 3) ---
+# (O resto do código do chat e da barra lateral continua aqui, sem alterações)
+# --- BARRA LATERAL PARA SELEÇÃO DE GEMS ---
 with st.sidebar:
     st.header("Equipe de Gems")
-    # Nossos especialistas. Quando "contratarmos" mais, é só adicionar a ID aqui!
     gem_selecionado = st.selectbox(
-        "Escolha o especialista com quem deseja conversar:",
+        "Escolha o especialista:",
         ("guia_tecnico_v1", "gem_qa_v1")
     )
-    st.info(f"Você está conversando com o **{gem_selecionado}**.")
+    st.info(f"Conversando com: **{gem_selecionado}**.")
 
-# --- INTERFACE DO CHAT (MUDANÇA 4) ---
+# --- LÓGICA DO CHAT COM MEMÓRIA ---
 st.header(f"Chat com {gem_selecionado}")
 
-prompt = st.text_input("Sua mensagem:", key="prompt_input")
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-if st.button("Enviar"):
-    if prompt:
-        with st.spinner(f"O {gem_selecionado} está pensando..."):
-            # Monta a URL completa do endpoint dinamicamente
+if supabase and not st.session_state.messages:
+    try:
+        response = supabase.table('gem_logs').select("*").eq('id_gem', gem_selecionado).order('created_at').execute()
+        if response.data:
+            for row in response.data:
+                if row.get('pergunta_usuario'):
+                    st.session_state.messages.append({"role": "user", "content": row['pergunta_usuario']})
+                if row.get('resumo_resposta_gem'):
+                    st.session_state.messages.append({"role": "assistant", "content": row['resumo_resposta_gem']})
+    except Exception as e:
+        st.error(f"Erro ao buscar histórico do Supabase: {e}")
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+if prompt := st.chat_input("Sua mensagem:"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    if supabase:
+        try:
+            supabase.table('gem_logs').insert({
+                "id_gem": gem_selecionado, 
+                "pergunta_usuario": prompt,
+                "id_projeto": "hub_interface_v1"
+            }).execute()
+        except Exception as e:
+            st.error(f"Erro ao salvar pergunta no Supabase: {e}")
+
+    with st.chat_message("assistant"):
+        with st.spinner("Pensando..."):
             endpoint_url = f"{API_BASE_URL}/invoke_gem/{gem_selecionado}"
-            
-            # Monta os dados para enviar para a API
             payload = {"pergunta": prompt}
-            
             try:
-                # Chamando nossa API FastAPI
                 response = requests.post(endpoint_url, json=payload, timeout=180)
                 response.raise_for_status()
-                
-                # Exibindo a resposta
                 resultado = response.json()
-                st.success("Resposta Recebida:")
-                st.markdown(resultado['resposta'])
+                resposta_gem = resultado['resposta']
+                st.markdown(resposta_gem)
+
+                st.session_state.messages.append({"role": "assistant", "content": resposta_gem})
+
+                if supabase:
+                    try:
+                        supabase.table('gem_logs').update({"resumo_resposta_gem": resposta_gem}).eq("pergunta_usuario", prompt).order('created_at', desc=True).limit(1).execute()
+                    except Exception as e:
+                        st.error(f"Erro ao atualizar resposta no Supabase: {e}")
 
             except requests.exceptions.RequestException as e:
                 st.error(f"Erro ao se comunicar com a API: {e}")
-    else:
-        st.warning("Por favor, digite uma mensagem.")
