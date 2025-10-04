@@ -3,20 +3,14 @@ import requests
 from supabase import create_client, Client
 import os
 
-# --- PAINEL DE DEBUG ---
-# --- PAINEL DE DEBUG ---
+# --- PAINEL DE DEBUG (Pode ser removido depois, se quiser) ---
 with st.expander("🕵️‍♀️ Painel de Detetive de Segredos"):
-    url_secret = st.secrets.get("SUPABASE_URL") is not None
-    key_secret = st.secrets.get("SUPABASE_KEY") is not None
-    st.write(f"Segredo SUPABASE_URL encontrado: {'✅ Sim' if url_secret else '❌ Não'}")
-    st.write(f"Segredo SUPABASE_KEY encontrado: {'✅ Sim' if key_secret else '❌ Não'}")
     url_secret = st.secrets.get("SUPABASE_URL") is not None
     key_secret = st.secrets.get("SUPABASE_KEY") is not None
     st.write(f"Segredo SUPABASE_URL encontrado: {'✅ Sim' if url_secret else '❌ Não'}")
     st.write(f"Segredo SUPABASE_KEY encontrado: {'✅ Sim' if key_secret else '❌ Não'}")
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
-st.set_page_config(page_title="Encontro D'Água Hub", page_icon="💧", layout="wide")
 st.set_page_config(page_title="Encontro D'Água Hub", page_icon="💧", layout="wide")
 
 # --- CONEXÃO COM O SUPABASE ---
@@ -31,16 +25,15 @@ st.title("💧 Painel de Comando do Encontro D'Água Hub")
 API_BASE_URL = "https://encontro-dagua-hub-api-192934687919.southamerica-east1.run.app"
 
 # --- BARRA LATERAL ---
-# --- BARRA LATERAL ---
 with st.sidebar:
     st.header("Equipe de Gems")
-    gem_selecionado = st.selectbox("Escolha o especialista:", ("guia_tecnico_v1", "gem_qa_v1"))
     gem_selecionado = st.selectbox("Escolha o especialista:", ("guia_tecnico_v1", "gem_qa_v1"))
     st.info(f"Conversando com: **{gem_selecionado}**.")
 
 # --- LÓGICA DO CHAT COM MEMÓRIA ---
 st.header(f"Chat com {gem_selecionado}")
 
+# Lógica para carregar o histórico ao iniciar ou trocar de Gem
 if "messages" not in st.session_state or st.session_state.get('current_gem') != gem_selecionado:
     st.session_state.messages = []
     st.session_state.current_gem = gem_selecionado
@@ -55,45 +48,32 @@ if "messages" not in st.session_state or st.session_state.get('current_gem') != 
                         st.session_state.messages.append({"role": "assistant", "content": row['resumo_resposta_gem']})
         except Exception as e:
             st.error(f"Erro ao buscar histórico do Supabase: {e}")
-    st.session_state.current_gem = gem_selecionado
-    if supabase:
-        try:
-            response = supabase.table('gem_logs').select("*").eq('id_gem', gem_selecionado).order('created_at').execute()
-            if response.data:
-                for row in response.data:
-                    if row.get('pergunta_usuario'):
-                        st.session_state.messages.append({"role": "user", "content": row['pergunta_usuario']})
-                    if row.get('resumo_resposta_gem'):
-                        st.session_state.messages.append({"role": "assistant", "content": row['resumo_resposta_gem']})
-        except Exception as e:
-            st.error(f"Erro ao buscar histórico do Supabase: {e}")
 
+# Exibe o histórico de mensagens
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
+# Captura a nova pergunta do usuário
 if prompt := st.chat_input("Sua mensagem:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
     new_log_id = None
-    new_log_id = None
     if supabase:
         try:
-            # --- LÓGICA DE INSERT 3.0 (CORRIGIDA) ---
-            # Inserimos os dados e o .execute() já retorna o que foi inserido
+            # Insere a pergunta e pede o ID de volta
             insert_response = supabase.table('gem_logs').insert({
                 "id_gem": gem_selecionado, 
                 "pergunta_usuario": prompt,
                 "id_projeto": "hub_interface_v1"
-            }).execute()
-            # Pegamos o ID da resposta da inserção
+            }).select('id').execute()
             new_log_id = insert_response.data[0]['id']
         except Exception as e:
             st.error(f"Erro ao salvar pergunta no Supabase: {e}")
     
-    
+    # Chama a API e exibe a resposta
     with st.chat_message("assistant"):
         with st.spinner("Pensando..."):
             endpoint_url = f"{API_BASE_URL}/invoke_gem/{gem_selecionado}"
@@ -105,14 +85,11 @@ if prompt := st.chat_input("Sua mensagem:"):
                 resposta_gem = resultado['resposta']
                 st.markdown(resposta_gem)
                 
-                
                 st.session_state.messages.append({"role": "assistant", "content": resposta_gem})
                 
-                if supabase and new_log_id:
-                
+                # Atualiza a resposta no Supabase usando o ID
                 if supabase and new_log_id:
                     try:
-                        # Lógica de update continua a mesma e já estava robusta
                         supabase.table('gem_logs').update({"resumo_resposta_gem": resposta_gem}).eq("id", new_log_id).execute()
                     except Exception as e:
                         st.error(f"Erro ao atualizar resposta no Supabase: {e}")
