@@ -1,1 +1,1 @@
-echo -e "streamlit\nrequests" > interface/requirements.txt
+echo -e "streamlit\nrequests" > interface/requirements.txtsupabase
