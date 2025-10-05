@@ -71,3 +71,5 @@ def invoke_gem(gem_id: str, request: QueryRequest):
 @app.get("/")
 def health_check():
     return {"status": "API do Encontro D'Água Hub (v3.0 Gerente com Memória) está no ar!"}
+
+    
