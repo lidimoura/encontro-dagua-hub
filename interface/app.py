@@ -3,7 +3,7 @@ import requests
 from supabase import create_client, Client
 import os
 
-# --- PAINEL DE DEBUG (Pode ser removido depois, se quiser) ---
+# --- PAINEL DE DEBUG (Pode ser removido depois) ---
 with st.expander("🕵️‍♀️ Painel de Detetive de Segredos"):
     url_secret = st.secrets.get("SUPABASE_URL") is not None
     key_secret = st.secrets.get("SUPABASE_KEY") is not None
@@ -68,7 +68,7 @@ if prompt := st.chat_input("Sua mensagem:"):
                 "id_gem": gem_selecionado, 
                 "pergunta_usuario": prompt,
                 "id_projeto": "hub_interface_v1"
-            }).select('id').execute()
+            }).execute()
             new_log_id = insert_response.data[0]['id']
         except Exception as e:
             st.error(f"Erro ao salvar pergunta no Supabase: {e}")
