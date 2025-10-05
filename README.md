@@ -61,17 +61,27 @@ O Rosto (Interface): Um painel de controle interativo para gerenciar e interagir
 <h3 align= "center"> 📁 Estrutura do Repositório </h3>
 
 ```bash
+## 📁 Estrutura do Repositório
+
 /encontro-dagua-hub
-  ├── 📂 api_backend/       
-  ├── 📂 assets/            
-  ├── 📂 interface/       
-  ├── 📂 conhecimento_base/    
-  ├── 📂 scripts/           
-  ├── 📂 specs/             
-  ├── 📄 .gitignore       
-  ├── 📄 LICENSE           
-  └── 📄 README.md         
-  ```
+  ├── 📂 api_backend/
+  │   ├── 📂 base_conhecimento/
+  │   │   ├── 📄 stack_atual_v2.md
+  │   │   └── ... (outros guias .md)
+  │   ├── 📄 main.py
+  │   └── 📄 requirements.txt
+  ├── 📂 interface/
+  │   └── 📄 app.py
+  ├── 📂 specs/
+  │   └── ... (todos os DNAs dos Gems .md)
+  ├── 📂 fontes/
+  │   └── ... (documentos de pesquisa para o NotebookLM)
+  ├── 📂 prompts/
+  │   └── ... (nossos prompts mestres salvos)
+  ├── 📄 Dockerfile
+  ├── 📄 requirements.txt      
+  ├── 📄 README.md
+  └── 📄 LICENSE  ```
 
 <h3 align= "center"> Como Começar </h3>
 <div align= "center"> O projeto está em desenvolvimento ativo. Para configurar o ambiente localmente, siga os passos abaixo: </div>
