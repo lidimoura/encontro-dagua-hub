@@ -20,7 +20,7 @@ with st.sidebar:
     st.header("Equipe de Gems")
     gem_selecionado = st.selectbox(
         "Escolha o especialista:",
-        ("guia_tecnico_v1", "gem_qa_v2.0", "gem_arquiteto_web_v1", "gem_onboarding_v1", "gem_revisor_entrega_v1", "gem_lovable_prompter_v1", "meta_gem_arquiteto_v1")
+        ("guia_tecnico_v1", "gem_briefing_v1", "gem_qa_v2.0", "gem_arquiteto_web_v1", "gem_onboarding_v1", "gem_revisor_entrega_v1", "gem_lovable_prompter_v1", "meta_gem_arquiteto_v1")
     )
     st.info(f"Conversando com: **{gem_selecionado}**.")
 
