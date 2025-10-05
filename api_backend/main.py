@@ -1,56 +1,33 @@
 import os
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import google.generativeai as genai
+from typing import List, Dict, Optional # <-- Importamos novas ferramentas de tipagem
 
-# Importações ATUALIZADAS do LangChain
-from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.chains import RetrievalQA
-from langchain_google_genai import GoogleGenerativeAI
-from langchain.prompts import PromptTemplate
-from langchain_community.document_loaders import DirectoryLoader # <-- FERRAMENTA NOVA!
+# (O resto das importações do LangChain continuam as mesmas)
+# ...
 
-# --- CONFIGURAÇÃO INICIAL ---
-api_key = os.getenv("GOOGLE_API_KEY")
-if api_key:
-    genai.configure(api_key=api_key)
-else:
-    print("⚠️ Chave de API não encontrada. O deploy pode falhar.")
+# (Configuração inicial e carregamento do RAG continuam os mesmos)
+# ...
 
-# --- CARREGAMENTO DO RAG v2.0 (LENDO A BIBLIOTECA INTEIRA) ---
-def carregar_vector_store():
-    # Aponta para a pasta e diz para ele procurar por todos os arquivos .md
-    loader = DirectoryLoader('base_conhecimento/', glob="**/*.md", show_progress=True)
-    
-    # Carrega todos os documentos encontrados
-    documentos = loader.load()
-    print(f"Carregados {len(documentos)} documentos da base de conhecimento.")
-    
-    # Divide os documentos em pedaços (chunks)
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-    chunks = text_splitter.split_documents(documentos)
-    print(f"Total de {len(chunks)} chunks de conhecimento criados.")
-    
-    # Gera os embeddings e cria o índice de busca
-    print("Gerando embeddings e criando o vector store. Isso pode levar um momento...")
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-    vector_store = FAISS.from_documents(documents=chunks, embedding=embeddings)
-    
-    print("✅ Vector Store pronto com a base de conhecimento completa!")
-    return vector_store
-
-# Carrega o conhecimento UMA VEZ quando a API inicia
-vector_store = carregar_vector_store()
-retriever = vector_store.as_retriever()
-llm = GoogleGenerativeAI(model="models/gemini-flash-latest")
-
-# --- API "GEM GERENTE" (Lógica continua a mesma) ---
+# --- API "GEM GERENTE" v3.0 com Memória ---
 app = FastAPI(title="Encontro D'Água Hub API")
 
+# --- MUDANÇA CRUCIAL AQUI ---
+# Atualizamos nosso modelo de requisição para aceitar o histórico
 class QueryRequest(BaseModel):
     pergunta: str
+    historico_chat: Optional[List[Dict[str, str]]] = None # O histórico é uma lista opcional
+
+# Função para formatar o histórico para o prompt
+def formatar_historico(historico: List[Dict[str, str]]) -> str:
+    if not historico:
+        return ""
+    
+    chat_formatado = "\n\nHistórico da Conversa Anterior:\n"
+    for msg in historico:
+        role = "Você" if msg["role"] == "user" else "Gem"
+        chat_formatado += f"- {role}: {msg['content']}\n"
+    return chat_formatado
 
 @app.post("/invoke_gem/{gem_id}")
 def invoke_gem(gem_id: str, request: QueryRequest):
@@ -64,13 +41,19 @@ def invoke_gem(gem_id: str, request: QueryRequest):
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail=f"Gem com id '{gem_id}' não encontrado.")
 
-    prompt_template = dna_do_gem + """
+    # --- MUDANÇA CRUCIAL AQUI ---
+    # Formatamos o histórico e o adicionamos ao prompt
+    historico_formatado = formatar_historico(request.historico_chat)
+    
+    prompt_template = dna_do_gem + historico_formatado + """
 
-    Contexto: {context}
-    Pergunta: {question}
+    Contexto Relevante (Buscado na Base de Conhecimento): {context}
+    Pergunta Atual do Usuário: {question}
     
     Sua Resposta:"""
     
+    # (O resto da lógica da cadeia de RAG continua a mesma)
+    from langchain.prompts import PromptTemplate
     QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt_template)
     
     qa_chain = RetrievalQA.from_chain_type(
@@ -87,4 +70,4 @@ def invoke_gem(gem_id: str, request: QueryRequest):
 
 @app.get("/")
 def health_check():
-    return {"status": "API do Encontro D'Água Hub (v2.0 Gerente) está no ar!"}
+    return {"status": "API do Encontro D'Água Hub (v3.0 Gerente com Memória) está no ar!"}
