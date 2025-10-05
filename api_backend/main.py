@@ -3,40 +3,34 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import google.generativeai as genai
 
-# Importações ATUALIZADAS do LangChain
 from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import Chroma  # <-- MUDANÇA AQUI
+from langchain_community.vectorstores import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
 from langchain_google_genai import GoogleGenerativeAI
 from langchain.prompts import PromptTemplate
-from langchain_community.document_loaders import DirectoryLoader
 
-# --- CONFIGURAÇÃO INICIAL DA CHAVE DE API ---
+# --- CONFIGURAÇÃO INICIAL ---
 api_key = os.getenv("GOOGLE_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
 else:
-    print("⚠️ Chave de API não encontrada. O deploy pode falhar se a variável de ambiente não estiver configurada.")
+    print("⚠️ Chave de API não encontrada.")
 
-# --- CARREGAMENTO DO RAG v2.0 (LENDO A BIBLIOTECA INTEIRA) ---
+# --- CARREGAMENTO DO RAG v1.0 (SIMPLES E ROBUSTO) ---
 def carregar_vector_store():
-    loader = DirectoryLoader('base_conhecimento/', glob="**/*.md", show_progress=True)
-    documentos = loader.load()
-    print(f"Carregados {len(documentos)} documentos da base de conhecimento.")
-    
+    # Voltamos a ler um único arquivo para garantir a estabilidade
+    caminho_base = "base_conhecimento/stack_atual_v2.md"
+    with open(caminho_base, 'r', encoding='utf-8') as f:
+        conteudo = f.read()
+
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-    chunks = text_splitter.split_documents(documentos)
-    print(f"Total de {len(chunks)} chunks de conhecimento criados.")
-    
-    print("Gerando embeddings e criando o vector store. Isso pode levar um momento...")
+    chunks = text_splitter.split_text(conteudo)
+
     embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-    
-    # --- MUDANÇA AQUI ---
-    # Trocamos FAISS.from_documents por Chroma.from_documents
     vector_store = Chroma.from_documents(documents=chunks, embedding=embeddings)
-    
-    print("✅ Vector Store (com Chroma) pronto com a base de conhecimento completa!")
+
+    print("✅ Vector Store (versão estável) pronto!")
     return vector_store
 
 # Carrega o conhecimento UMA VEZ quando a API inicia
@@ -52,10 +46,7 @@ class QueryRequest(BaseModel):
 
 @app.post("/invoke_gem/{gem_id}")
 def invoke_gem(gem_id: str, request: QueryRequest):
-    print(f"Recebido pedido para o Gem: {gem_id}")
-    
     caminho_da_receita = f"specs/{gem_id}.md"
-    
     try:
         with open(caminho_da_receita, 'r', encoding='utf-8') as f:
             dna_do_gem = f.read()
@@ -66,17 +57,17 @@ def invoke_gem(gem_id: str, request: QueryRequest):
 
     Contexto: {context}
     Pergunta: {question}
-    
-    Sua Resposta:"""
-    
-    QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt_template)
-    
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=retriever,
-        return_source_documents=True,
-        chain_type_kwargs={"prompt": QA_CHAIN_PROMPT}
-    )
 
-    resultado = qa_chain.invoke
+    Sua Resposta:"""
+
+    QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt_template)
+    qa_chain = RetrievalQA.from_chain_type(
+        llm=llm, chain_type="stuff", retriever=retriever,
+        return_source_documents=True, chain_type_kwargs={"prompt": QA_CHAIN_PROMPT}
+    )
+    resultado = qa_chain.invoke({"query": request.pergunta})
+    return {"resposta": resultado["result"], "fontes": [doc.page_content for doc in resultado["source_documents"]]}
+
+@app.get("/")
+def health_check():
+    return {"status": "API do Encontro D'Água Hub (v3.0 Estável) está no ar!"}
