@@ -3,9 +3,9 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import google.generativeai as genai
 
-# Importações COMPLETAS do LangChain
+# Importações ATUALIZADAS do LangChain
 from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import Chroma  # <-- MUDANÇA AQUI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
 from langchain_google_genai import GoogleGenerativeAI
@@ -21,9 +21,7 @@ else:
 
 # --- CARREGAMENTO DO RAG v2.0 (LENDO A BIBLIOTECA INTEIRA) ---
 def carregar_vector_store():
-    # Aponta para a pasta e diz para ele procurar por todos os arquivos .md
     loader = DirectoryLoader('base_conhecimento/', glob="**/*.md", show_progress=True)
-    
     documentos = loader.load()
     print(f"Carregados {len(documentos)} documentos da base de conhecimento.")
     
@@ -31,11 +29,14 @@ def carregar_vector_store():
     chunks = text_splitter.split_documents(documentos)
     print(f"Total de {len(chunks)} chunks de conhecimento criados.")
     
-    print("Gerando embeddings e criando o vector store...")
+    print("Gerando embeddings e criando o vector store. Isso pode levar um momento...")
     embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-    vector_store = FAISS.from_documents(documents=chunks, embedding=embeddings)
     
-    print("✅ Vector Store pronto com a base de conhecimento completa!")
+    # --- MUDANÇA AQUI ---
+    # Trocamos FAISS.from_documents por Chroma.from_documents
+    vector_store = Chroma.from_documents(documents=chunks, embedding=embeddings)
+    
+    print("✅ Vector Store (com Chroma) pronto com a base de conhecimento completa!")
     return vector_store
 
 # Carrega o conhecimento UMA VEZ quando a API inicia
@@ -78,10 +79,4 @@ def invoke_gem(gem_id: str, request: QueryRequest):
         chain_type_kwargs={"prompt": QA_CHAIN_PROMPT}
     )
 
-    resultado = qa_chain.invoke({"query": request.pergunta})
-    
-    return {"resposta": resultado["result"], "fontes": [doc.page_content for doc in resultado["source_documents"]]}
-
-@app.get("/")
-def health_check():
-    return {"status": "API do Encontro D'Água Hub (v2.0 Gerente) está no ar!"}
+    resultado = qa_chain.invoke

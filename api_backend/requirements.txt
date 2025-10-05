@@ -3,7 +3,7 @@ uvicorn
 langchain
 langchain-google-genai
 langchain-community
-faiss-cpu
+langchain-chroma 
 google-ai-generativelanguage==0.6.15
 python-dotenv
 beautifulsoup4
