@@ -27,7 +27,8 @@ API_BASE_URL = "https://encontro-dagua-hub-api-192934687919.southamerica-east1.r
 # --- BARRA LATERAL ---
 with st.sidebar:
     st.header("Equipe de Gems")
-    gem_selecionado = st.selectbox("Escolha o especialista:", ("guia_tecnico_v1", "gem_qa_v1", "gem_arquiteto_web_v1", "gem_lovable_prompter_v1"))
+    gem_selecionado = st.selectbox("Escolha o especialista:",
+    ("guia_tecnico_v1", "gem_qa_v1", "gem_arquiteto_web_v1", "gem_lovable_prompter_v1", "meta_gem_arquiteto"))
     st.info(f"Conversando com: **{gem_selecionado}**.")
 
 # --- LÓGICA DO CHAT COM MEMÓRIA ---
