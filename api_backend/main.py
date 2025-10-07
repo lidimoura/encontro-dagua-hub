@@ -85,9 +85,12 @@ def generate_gemini_response(user_query: str, retrieved_contexts: list[str]) -> 
         print(f"❌ Erro ao gerar resposta com o Gemini: {e}")
         return "Desculpe, ocorreu um erro ao tentar gerar a resposta."
 
-def select_specialist_gem(user_query: str) -> str:
+def select_specialist_or_get_answer(user_query: str) -> str:
     """
-    Usa o 'Gem Gerente' para decidir qual especialista deve lidar com a pergunta.
+    Usa o 'Gem Gerente' para decidir o próximo passo:
+    1. Responder diretamente (se for uma pergunta sobre o Hub).
+    2. Criar um plano de ação (se for um novo projeto).
+    3. Rotear para um especialista (se for uma tarefa pontual).
     """
     print(f"🤖 Gem Gerente está analisando a pergunta: '{user_query}'")
     try:
@@ -95,48 +98,47 @@ def select_specialist_gem(user_query: str) -> str:
         with open(pathlib.Path("specs/gem_gerente_v1.md"), "r", encoding="utf-8") as f:
             manager_prompt_template = f.read()
 
+        # O prompt agora é mais aberto, instruindo o Gem a seguir seu blueprint.
         prompt = f"""
         {manager_prompt_template}
 
         ---
         Pergunta do Usuário a ser analisada: "{user_query}"
         ---
-
-        Qual é o ID do Gem especialista mais adequado para esta pergunta? Responda apenas com o ID.
         """
 
         response = gemini_model.generate_content(prompt)
-        selected_gem_id = response.text.strip()
-        
-        # Validação simples para garantir que a resposta é um ID esperado
-        available_gems = ["guia_tecnico_v1", "gem_briefing_v1", "gem_qa_v2.0", "gem_arquiteto_web_v1", "gem_onboarding_v1", "gem_revisor_entrega_v1", "gem_lovable_prompter_v1", "meta_gem_arquiteto_v1"]
-        if selected_gem_id in available_gems:
-            print(f"✅ Gem Gerente escolheu: {selected_gem_id}")
-            return selected_gem_id
-        else:
-            print(f"⚠️ Gem Gerente retornou uma resposta inesperada ('{selected_gem_id}'). Usando fallback.")
-            return "guia_tecnico_v1" # Um fallback seguro
+        manager_response = response.text.strip()
+        print(f"✅ Resposta do Gem Gerente: '{manager_response}'")
+        return manager_response
 
     except Exception as e:
         print(f"❌ Erro no Gem Gerente: {e}. Usando fallback.")
-        return "guia_tecnico_v1" # Retorna um especialista padrão em caso de erro
+        return "Desculpe, o Gem Gerente está indisponível no momento. Tente novamente."
 
 @app.post("/invoke_gem/{gem_id}")
 def invoke_gem(gem_id: str, payload: dict):
     """
     Recebe uma pergunta, usa o RAG Engine para buscar contexto e o Gemini para gerar a resposta.
-    Se o gem_id for 'gem_gerente_v1', ele primeiro determina o especialista correto.
+    Se o gem_id for 'gem_gerente_v1', ele primeiro determina o especialista ou a resposta direta.
     """
     pergunta = payload.get("pergunta")
-    # O histórico do chat está no payload, mas não vamos usá-lo por enquanto para simplificar.
-    # historico = payload.get("historico_chat", [])
     print(f"Recebido para o gem '{gem_id}': '{pergunta}'")
 
+    available_gems = ["guia_tecnico_v1", "gem_briefing_v1", "gem_qa_v2.0", "gem_arquiteto_web_v1", "gem_onboarding_v1", "gem_revisor_entrega_v1", "gem_lovable_prompter_v1", "meta_gem_arquiteto_v1"]
     effective_gem_id = gem_id
 
     # --- LÓGICA DO GERENTE ---
     if gem_id == "gem_gerente_v1":
-        effective_gem_id = select_specialist_gem(pergunta)
+        manager_output = select_specialist_or_get_answer(pergunta)
+        # Se a saída do gerente for um ID de especialista, nós o usamos.
+        if manager_output in available_gems:
+            effective_gem_id = manager_output
+        # Se não for um ID, é uma resposta direta ou um plano. Retornamos imediatamente.
+        else:
+            print("✅ Gem Gerente forneceu uma resposta direta. Retornando ao usuário.")
+            # A lógica de salvar no Supabase pode ser adicionada aqui se desejado
+            return {"resposta": manager_output}
 
     try:
         # 1. Buscar contextos no RAG Engine

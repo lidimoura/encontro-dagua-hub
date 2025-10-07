@@ -44,7 +44,20 @@ Com o objetivo de profissionalizar e otimizar o Hub, uma refatoração significa
     *   **O que mudou**: Foi introduzido um novo agente, o `gem_gerente_v1`, cujo DNA (`specs/gem_gerente_v1.md`) o instrui a atuar como um roteador inteligente.
     *   **Nova Abordagem**: Ao receber uma pergunta, o "Gem Gerente" analisa a intenção e escolhe o Gem especialista mais adequado da sua lista de conhecimento. A função `select_specialist_gem` no backend implementa essa lógica.
     *   **Benefício**: Simplifica a experiência do usuário, que não precisa mais saber qual especialista escolher. O Hub se torna mais autônomo.
+ 
+## Evolução do Gem Gerente para Orquestrador (08/10/2025)
 
-3.  **Atualização da Interface e Backend**:
-    *   O endpoint `/invoke_gem/{gem_id}` foi atualizado para identificar quando a chamada é para o `gem_gerente_v1` e executar a lógica de roteamento antes de prosseguir.
-    *   A interface Streamlit (`interface/app.py`) foi ajustada para posicionar o `gem_gerente_v1` como a opção principal e padrão, melhorando a usabilidade.
+Com o objetivo de aumentar a autonomia e a inteligência do Hub, o Gem Gerente evoluiu de um simples roteador para um verdadeiro orquestrador de soluções.
+
+1.  **Inteligência Aprimorada no Blueprint**:
+    *   **O que mudou**: O DNA do `gem_gerente_v1` (`specs/gem_gerente_v1.md`) foi completamente reescrito.
+    *   **Nova Abordagem**: O gerente agora possui 3 comportamentos principais, definidos por regras claras:
+        1.  **Resposta Direta**: Se a pergunta é sobre o Hub ou seus processos, ele mesmo responde usando o RAG.
+        2.  **Plano de Ação**: Se o usuário quer iniciar um novo projeto, ele descreve o plano sequencial de Gems a serem usados.
+        3.  **Roteamento Pontual**: Se a tarefa é específica para um especialista, ele delega retornando o ID do Gem.
+    *   **Benefício**: O Hub se torna capaz de lidar com ambiguidades e tarefas complexas de ponta a ponta.
+
+2.  **Adaptação do Backend (`main.py`)**:
+    *   **O que mudou**: A função `invoke_gem` foi atualizada para interpretar a nova capacidade do gerente.
+    *   **Nova Abordagem**: A API agora verifica a resposta do `gem_gerente_v1`. Se a resposta não for um ID de Gem válido, ela é tratada como uma resposta final (um plano ou informação) e retornada diretamente ao usuário, encerrando o fluxo. Se for um ID, o fluxo de RAG e geração de resposta continua normalmente com o Gem especialista escolhido.
+    *   **Benefício**: A API se torna flexível, suportando tanto a delegação de tarefas quanto a entrega de respostas diretas pelo orquestrador.
