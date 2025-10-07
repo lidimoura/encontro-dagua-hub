@@ -61,3 +61,26 @@ Com o objetivo de aumentar a autonomia e a inteligência do Hub, o Gem Gerente e
     *   **O que mudou**: A função `invoke_gem` foi atualizada para interpretar a nova capacidade do gerente.
     *   **Nova Abordagem**: A API agora verifica a resposta do `gem_gerente_v1`. Se a resposta não for um ID de Gem válido, ela é tratada como uma resposta final (um plano ou informação) e retornada diretamente ao usuário, encerrando o fluxo. Se for um ID, o fluxo de RAG e geração de resposta continua normalmente com o Gem especialista escolhido.
     *   **Benefício**: A API se torna flexível, suportando tanto a delegação de tarefas quanto a entrega de respostas diretas pelo orquestrador.
+
+## Pivô Estratégico para OpenAI e LangChain (09/10/2025)
+
+Após semanas de desafios persistentes com o deploy no Google Cloud Run, que resultaram em um looping de erros de `ModuleNotFoundError` e `Container failed to start`, foi tomada a decisão estratégica de pivotar a stack de IA para uma arquitetura mais robusta e padrão de mercado.
+
+1.  **Migração do Backend de IA**:
+    *   **O que mudou**: As bibliotecas `google-cloud-discoveryengine` e `google-cloud-aiplatform` foram removidas. Foram adicionadas as bibliotecas `openai`, `langchain`, `chromadb` e suas dependências.
+    *   **Nova Abordagem**: O arquivo `api_backend/main.py` foi completamente refatorado. A lógica de RAG agora é construída com LangChain, utilizando `ChatOpenAI` como LLM, `OpenAIEmbeddings` para vetorização e `Chroma` como banco de dados vetorial em memória.
+    *   **Benefício**: Maior estabilidade, portabilidade e uma base de código mais fácil de depurar, alinhada com tutoriais e comunidades de IA. A lógica do "Gem Gerente" foi preservada e adaptada para a nova stack.
+
+2.  **Gerenciamento de Segredos**:
+    *   **O que mudou**: A chave `GOOGLE_API_KEY` foi substituída pela `OPENAI_API_KEY`.
+    *   **Nova Abordagem**: A nova chave da OpenAI foi adicionada ao Google Secret Manager e conectada ao serviço do Cloud Run, mantendo as melhores práticas de segurança.
+
+## Otimização de Inicialização (Cold Start) no Cloud Run (09/10/2025)
+
+Mesmo após o pivô, o deploy enfrentou um erro de `Container failed to start` devido ao tempo de inicialização.
+
+1.  **Diagnóstico**: A criação do índice vetorial (RAG) estava ocorrendo no escopo global do `main.py`, sendo executada durante a inicialização do contêiner. Em ambientes serverless, isso pode exceder o tempo limite de startup.
+2.  **Solução**:
+    *   **O que mudou**: O `main.py` foi refatorado para usar um padrão "Singleton" (lazy loading) para o carregamento do RAG.
+    *   **Nova Abordagem**: A função `carregar_e_processar_documentos` agora só é chamada dentro do endpoint `invoke_gem`. Ela armazena o índice em uma variável global e só executa o trabalho pesado de carregar e processar os documentos na **primeira chamada** à API, sendo instantânea nas chamadas subsequentes.
+    *   **Benefício**: Reduz drasticamente o tempo de inicialização do contêiner, resolvendo o erro de timeout e melhorando a performance em "cold starts".

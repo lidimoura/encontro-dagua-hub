@@ -23,6 +23,9 @@ if SUPABASE_URL and SUPABASE_KEY:
 llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY, model_name="gpt-3.5-turbo", temperature=0)
 embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
 
+# Variável global para armazenar o retriever (padrão Singleton)
+_db_retriever = None
+
 # --- CARREGAMENTO E PROCESSAMENTO DA BASE DE CONHECIMENTO (RAG) ---
 def carregar_e_processar_documentos():
     """
@@ -30,24 +33,32 @@ def carregar_e_processar_documentos():
     divide-os em pedaços e os armazena em um banco de dados vetorial em memória (Chroma).
     Retorna um "retriever" que pode ser usado para buscar informações.
     """
+    global _db_retriever
+    # Se o retriever já foi criado, apenas o retorne.
+    if _db_retriever:
+        print("✅ Usando retriever de documentos já carregado.")
+        return _db_retriever
+
     print("Iniciando carregamento da base de conhecimento...")
     # Carrega tanto os specs dos gems quanto a base de conhecimento geral
     loader_specs = DirectoryLoader('specs/', glob="**/*.md", loader_cls=TextLoader, show_progress=True)
     loader_base = DirectoryLoader('base_conhecimento/', glob="**/*.md", loader_cls=TextLoader, show_progress=True)
     documentos = loader_specs.load() + loader_base.load()
-    print(f"✅ {len(documentos)} documentos carregados.")
+    if not documentos:
+        raise FileNotFoundError("Nenhum documento encontrado nas pastas 'specs' ou 'base_conhecimento'. Verifique se os arquivos foram copiados para o contêiner.")
+    print(f"✅ {len(documentos)} documentos carregados com sucesso.")
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     textos = text_splitter.split_documents(documentos)
     print(f"📄 Documentos divididos em {len(textos)} pedaços.")
 
     # Cria o banco de dados vetorial em memória
-    vector_db = Chroma.from_documents(textos, embeddings)
+    vector_db = Chroma.from_documents(documentos=textos, embedding=embeddings)
     print("✅ Banco de dados vetorial criado em memória.")
-    return vector_db.as_retriever()
+    _db_retriever = vector_db.as_retriever()
+    return _db_retriever
 
 app = FastAPI(title="Encontro D'Água Hub API (OpenAI Edition)")
-db_retriever = carregar_e_processar_documentos()
 
 @app.get("/")
 def health_check():
@@ -105,6 +116,9 @@ def invoke_gem(gem_id: str, payload: dict):
 
         # Monta o prompt final para o RAG
         prompt_template = dna_do_gem + """
+
+        # Cria o retriever sob demanda (apenas na primeira chamada)
+        db_retriever = carregar_e_processar_documentos()
 
         Contexto: {context}
         Pergunta: {question}
