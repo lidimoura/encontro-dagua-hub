@@ -1,10 +1,5 @@
 fastapi
 uvicorn
-langchain
-langchain-google-genai
-langchain-community
-langchain-chroma 
-google-ai-generativelanguage==0.6.15
-python-dotenv
-beautifulsoup4
-unstructured
+supabase
+google-cloud-discoveryengine
+google-cloud-aiplatform>=1.38.0

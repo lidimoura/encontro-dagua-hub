@@ -1,0 +1,3 @@
+vc pode lembar do contxto do streamlit
+requests
+supabase
