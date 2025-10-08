@@ -144,7 +144,7 @@ def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente
 def chat_interface():
     
     st.set_page_config(page_title="Encontro D'Água Hub", layout="wide")
-    st.title("🌊 Encontro D'Água Hub - Orquestrador de Soluções")
+    st.title("🌀 Encontro D'Água Hub - Orquestrador de Soluções")
     
     if not vector_store:
         st.error("O Hub não pôde inicializar o Vector Store. Por favor, verifique os logs de erro ou o caminho do arquivo de conhecimento.")
@@ -163,7 +163,7 @@ def chat_interface():
     ]
     
     with st.sidebar:
-        st.subheader("🛠️ Controles do Hub (Arquiteta)")
+        st.subheader("Controles do Hub (Arquiteta)")
         st.write(f"ID da Sessão: `{current_session_id[:8]}...`")
         
         agente_override = st.selectbox(
