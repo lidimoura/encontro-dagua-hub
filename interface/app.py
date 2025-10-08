@@ -100,8 +100,7 @@ def invoke_agente(agente_id: str, pergunta: str):
         with open(caminho_do_dna, 'r', encoding='utf-8') as f:
             dna_do_agente = f.read()
     except FileNotFoundError:
-        # AQUI ESTÁ A ÚLTIMA CORREÇÃO DE ERRO: AGENTE NÃO ENCONTRADO
-        return f"Erro: Agente com ID '{agente_id}' não encontrado em {caminho_do_dna}."
+        return f"Erro: Agente com ID '{agente_id}' não encontrado em {caminho_do_dna}. Verifique se o nome do arquivo corresponde ao ID no código."
 
     prompt_template = dna_do_agente + "\n\nContexto: {context}\nPergunta: {question}\n\nSua Resposta:"
     QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt_template)
@@ -115,8 +114,8 @@ def invoke_agente(agente_id: str, pergunta: str):
     return resultado["result"]
 
 
-# CORREÇÃO DO ID AQUI: AGENTE_GERENTE_V2
-def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v2"):
+# CORREÇÃO DO ID AQUI: AGENTE_GERENTE_V2.2
+def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v2.2"):
     """
     Controla o fluxo principal: O Agente Gerente decide se responde ou delega.
     """
@@ -153,8 +152,8 @@ def chat_interface():
 
     current_session_id = st.session_state["session_id"]
     
-    # CORREÇÃO DO ID AQUI: AGENTE_GERENTE_V2
-    AGENTE_GERENTE_ID = "agente_gerente_v2" 
+    # CORREÇÃO DO ID AQUI: AGENTE_GERENTE_V2.2
+    AGENTE_GERENTE_ID = "agente_gerente_v2.2" 
     
     available_agentes = [
         "agente_qa_v2", 
@@ -171,7 +170,7 @@ def chat_interface():
             "Forçar Especialista (Override):", 
             [AGENTE_GERENTE_ID] + available_agentes,
             # CORREÇÃO DA INTERFACE AQUI: Gerente Padrão
-            format_func=lambda x: f"Gerente Padrão" if x == AGENTE_GERENTE_ID else x.replace("agente_", "").replace("_v1", "").replace("_v2", "").upper()
+            format_func=lambda x: f"Gerente Padrão" if x == AGENTE_GERENTE_ID else x.replace("agente_", "").replace("_v1", "").replace("_v2", "").upper().replace("2.2", "").replace(".", "")
         )
         
         if st.button("Limpar Histórico de Conversa (Memória)"):
