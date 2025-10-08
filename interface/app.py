@@ -114,7 +114,7 @@ def invoke_agente(agente_id: str, pergunta: str):
     return resultado["result"]
 
 
-# CORREÇÃO DO ID AQUI: AGENTE_GERENTE_V3
+# ID: AGENTE_GERENTE_V3
 def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v3"):
     """
     Controla o fluxo principal: O Agente Gerente decide se responde ou delega.
@@ -143,7 +143,8 @@ def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente
 
 def chat_interface():
     
-    st.set_page_config(page_title="Encontro D'Água Hub", layout="wide")
+    # CORREÇÃO DO BRANDING (EMOJI) AQUI
+    st.set_page_config(page_title="🌀 Encontro D'Água Hub", layout="wide")
     st.title("🌀 Encontro D'Água Hub - Orquestrador de Soluções")
     
     if not vector_store:
@@ -152,7 +153,7 @@ def chat_interface():
 
     current_session_id = st.session_state["session_id"]
     
-    # CORREÇÃO DO ID AQUI: AGENTE_GERENTE_V3
+    # ID: AGENTE_GERENTE_V3
     AGENTE_GERENTE_ID = "agente_gerente_v3" 
     
     available_agentes = [
@@ -163,14 +164,14 @@ def chat_interface():
     ]
     
     with st.sidebar:
+        # CORREÇÃO ESTÉTICA: REMOVENDO O EMOJI 🛠️ (mantendo o que você fez)
         st.subheader("Controles do Hub (Arquiteta)")
         st.write(f"ID da Sessão: `{current_session_id[:8]}...`")
         
         agente_override = st.selectbox(
             "Forçar Especialista (Override):", 
             [AGENTE_GERENTE_ID] + available_agentes,
-            # CORREÇÃO DA INTERFACE AQUI: Gerente Padrão
-            format_func=lambda x: f"Gerente Padrão" if x == AGENTE_GERENTE_ID else x.replace("agente_", "").replace("_v1", "").replace("_v2", "").replace("v3", "").replace(".", "").upper()
+            format_func=lambda x: f"Gerente Padrão" if x == AGENTE_GERENTE_ID else x.replace("agente_", "").replace("_v1", "").replace("_v2", "").replace("v3", "").replace("meta_", "").replace(".", "").upper()
         )
         
         if st.button("Limpar Histórico de Conversa (Memória)"):
