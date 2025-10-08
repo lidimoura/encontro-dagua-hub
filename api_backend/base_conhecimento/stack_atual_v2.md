@@ -79,3 +79,4 @@ Estas são ferramentas adicionais do seu stack de trabalho. Os Gems devem estar 
 
 ### Make (anteriormente Integromat)
 -   **Papel no Ecossistema:** A "cola" de automação visual. É a principal ferramenta para integrar diferentes APIs e serviços sem a necessidade de código complexo.
+
