@@ -67,7 +67,6 @@ def carregar_vector_store():
         return None
         
     try:
-        # CORREÇÃO: Usando o Loader e garantindo que o Unstructured esteja instalado
         loader = UnstructuredFileLoader(CAMINHO_DO_CONHECIMENTO)
         documents = loader.load() 
         
@@ -77,10 +76,8 @@ def carregar_vector_store():
         embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
         vector_store = Chroma.from_documents(documents=chunks, embedding=embeddings)
         
-        print("✅ Vector Store (Chroma + OpenAI) pronto!")
         return vector_store
     except Exception as e:
-        # Se falhar aqui, o problema é na instalação do RAG ou no caminho do arquivo!
         st.error(f"Erro ao carregar o RAG: {e}") 
         return None
 
@@ -130,16 +127,14 @@ def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente
             agente_selecionado = decisao_bruta.split(DELEGATION_MARKER)[1].strip()
             agente_selecionado = agente_selecionado.replace(".", "").lower() 
             
-            st.info(f"Orquestrador decidiu: Roteando para o **{agente_selecionado}**...")
+            st.info(f"Gerente decidiu: Roteando para o **{agente_selecionado}**...")
             
             resposta_final = invoke_agente(agente_id=agente_selecionado, pergunta=pergunta_usuario)
             return resposta_final
         except Exception:
-            # Se a delegação falhar, retorna a resposta original do Gerente
             return decisao_bruta
     
     else:
-        # Se não houver DELEGAR, o próprio Gerente responde.
         return decisao_bruta
 
 
@@ -150,17 +145,14 @@ def chat_interface():
     st.set_page_config(page_title="Encontro D'Água Hub", layout="wide")
     st.title("🌊 Encontro D'Água Hub - Orquestrador de Soluções")
     
-    # Se o RAG falhou, para aqui
     if not vector_store:
         st.error("O Hub não pôde inicializar o Vector Store. Por favor, verifique os logs de erro ou o caminho do arquivo de conhecimento.")
         return
 
     current_session_id = st.session_state["session_id"]
     
-    # NOME CORRIGIDO para o ID que você manteve:
     AGENTE_GERENTE_ID = "agente_gerente_v1" 
     
-    # Lista de Agentes disponíveis para o Override Manual (Ajustada para a sua lista atual)
     available_agentes = [
         "agente_qa_v2", 
         "agente_briefing_v1", 
@@ -175,7 +167,7 @@ def chat_interface():
         agente_override = st.selectbox(
             "Forçar Especialista (Override):", 
             [AGENTE_GERENTE_ID] + available_agentes,
-            format_func=lambda x: f"Orquestrador Padrão (Gerente)" if x == AGENTE_GERENTE_ID else x.replace("agente_", "").replace("_v1", "").replace("_v2", "").upper()
+            format_func=lambda x: f"Gerente Padrão" if x == AGENTE_GERENTE_ID else x.replace("agente_", "").replace("_v1", "").replace("_v2", "").upper()
         )
         
         if st.button("Limpar Histórico de Conversa (Memória)"):
