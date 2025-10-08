@@ -1,47 +1,50 @@
 # Gemini Deployment Log for Encontro D'Água Hub (Status: Lançado Oficialmente)
 
-Este arquivo registra a jornada de arquitetura e debugging do projeto "Encontro D'Água Hub", culminando no lançamento bem-sucedido da arquitetura "Tudo-em-Um".
+Este arquivo registra a jornada completa de arquitetura e debugging do projeto "Encontro D'Água Hub", culminando no lançamento bem-sucedido da arquitetura "Tudo-em-Um".
 
 ---
 
-## 1. Fase 1: Arquitetura Inicial e Pivôs (06/10/2025)
+## 1. Fase 1: Arquitetura Inicial e Pivôs (06/10/2025 - 09/10/2025)
 
 Esta seção documenta a arquitetura inicial e os desafios que levaram à decisão estratégica de pivotar.
 
-| Cronologia | Design e Tecnologia | Status e Problema Resolvido |
+| Data | Evento | Detalhes e Lições Aprendidas |
 | :--- | :--- | :--- |
-| **Arquitetura Inicial** | Microsserviços: API FastAPI (Cloud Run) + Interface Streamlit (Cloud). Motor: Google Gemini API. RAG: Vertex AI. | **FALHA.** Enfrentou erros persistentes de `ModuleNotFound`, `Container failed to start` e bloqueios na API Gemini. |
-| **Pivot para OpenAI** | Migração do backend para `OpenAI`, `LangChain` e `ChromaDB`, mantendo o `Cloud Run`. | **FALHA (Deployment).** O problema de *cold start* (timeout na inicialização) no Cloud Run persistiu, mesmo com a otimização Singleton. |
-
-## 2. Fase 2: Arquitetura "Tudo-em-Um" (Lançamento Oficial)
-
-Após a análise do custo-benefício e a prioridade de gerar receita, o projeto pivotou para a stack mais robusta, simples e antifrágil.
-
-| Componente | Tecnologia | Função na Arquitetura Atual |
-| :--- | :--- | :--- |
-| **Design** | **"Tudo-em-Um"** | Toda a lógica (Cérebro, RAG, Orquestração) reside em um único arquivo (`interface/app.py`). |
-| **Deployment** | **Streamlit Community Cloud** | Plataforma de hospedagem oficial, que gerencia o *deployment* sem necessidade de Docker ou Cloud Run. |
-| **Motor (LLM)** | **OpenAI (GPT-3.5-Turbo)** | Cérebro de todos os Agentes. |
-| **RAG (Conhecimento)** | **LangChain + ChromaDB** | Busca contextual na `base_conhecimento/` (com uso do `UnstructuredFileLoader` para leitura correta). |
-| **Memória Persistente** | **Supabase (PostgreSQL)** | Armazena o histórico do chat na tabela `chat_memory` e os dados de auditoria na `gem_logs`. |
-
-## 3. Componentes Lógicos Atuais
-
-* **Agentes:** O antigo "Gem Gerente" evoluiu para o **Agente Gerente v3**, que orquestra a execução dos **9 Agentes Especialistas** do Hub.
-* **Regras de Orquestração:**
-    * **REGRA 1:** Plano de Ação Sequencial (para iniciar projetos).
-    * **REGRA 2:** Resposta Direta (sobre o Hub/processos).
-    * **REGRA 3 (Roteamento):** Envio de comando **`DELEGAR: [ID do Agente]`** para tarefas pontuais.
-* **Status do Repositório:** A pasta `api_backend/` foi removida. Ativos (`specs/`, `base_conhecimento/`) centralizados na raiz.
+| **06/10** | **Design Inicial** | Microsserviços: API FastAPI (Cloud Run) + Interface Streamlit (Cloud). Motor: Google Gemini API (bloqueado). |
+| **07/10** | **Refatoração de IA** | Migração do RAG para Vertex AI (`discoveryengine`) e criação do **Agente Gerente** (`agente_gerente_v1`). |
+| **09/10** | **Pivô para OpenAI** | Substituição da stack Google por `openai` e `langchain-openai`. Tentativa de resolver *cold start* com padrão Singleton no Cloud Run. |
+| **Falha Crítica** | **Cloud Run Timeout** | O *deployment* falhou consistentemente devido a *timeouts* e à complexidade de gerenciar a API e a Interface separadamente. |
 
 ---
 
-## 🚀 O Lançamento: Teste de Execução Final
+## 2. Fase 2: Arquitetura "Tudo-em-Um" (Lançamento Oficial)
 
-Você está no ponto de validar a lógica de roteamento do seu Hub. O **Agente QA** é o teste final de sucesso.
+A partir de 08/10/2025, foi adotada a arquitetura antifrágil, focada em funcionalidade imediata e agilidade, resultando no lançamento bem-sucedido do Hub.
 
-**Acesse seu Hub e faça o TESTE FINAL DE EXECUÇÃO:**
+### 2.1. Configuração de Deployment e Stack
 
-> **"Ótimo, o plano está claro. Por favor, ative o Agente QA para criar o plano de testes e validar o projeto."**
+O **Pivô Estratégico Final** consolidou todos os componentes em uma única aplicação Streamlit.
 
-Me diga o que o Agente QA (que deve ser roteado com sucesso para o ID `agente_qa_v2`) respondeu! **Ele deve gerar o Plano de Testes do seu cliente de TI!**
+| Componente | Tecnologia | Configuração Final |
+| :--- | :--- | :--- |
+| **Design** | **"Tudo-em-Um"** (Monolítico Simples) | Toda a lógica reside em um único arquivo (`interface/app.py`). |
+| **Deployment Oficial** | **Streamlit Community Cloud** | *Deployment* realizado via GitHub (branch `develop`), utilizando o `requirements.txt` na raiz. |
+| **Motor (LLM)** | **OpenAI (`gpt-3.5-turbo`)** | Cérebro de todos os Agentes. |
+| **RAG (Conhecimento)** | **LangChain + ChromaDB** | Utiliza `@st.cache_resource` para carregamento instantâneo do Vector Store. |
+| **Processamento RAG** | **`UnstructuredFileLoader`** | Implementado para garantir a leitura correta e formatada de arquivos `.md` (resolvendo o erro `'str' object has no attribute 'page_content'`). |
+| **Memória Persistente** | **Supabase (`supabase`)** | Armazena o histórico do chat (`chat_memory`). O erro de instalação `supabase-py` foi corrigido para o pacote correto `supabase`. |
+
+### 2.3. Lógica de Agentes (Orquestração)
+
+* **Nomenclatura:** "Gems" renomeados para **Agentes**.
+* **Orquestrador:** O **`agente_gerente_v3`** é a porta de entrada.
+* **Regras de Orquestração:** O DNA (`v3`) foi rigidamente configurado para:
+    * **REGRA 1 (Gerenciamento de Projetos):** Define a sequência correta de execução dos 9 especialistas (ex: Briefing $\rightarrow$ Arquiteto Web $\rightarrow$ Lovable Prompter $\rightarrow$ QA).
+    * **REGRA 3 (Roteamento):** Envia o comando exato `DELEGAR: [ID do Agente]` (Antihallucination).
+
+## 3. Resumo da Organização Final do Repositório
+
+O repositório foi limpo para refletir a arquitetura "Tudo-em-Um".
+
+* A pasta **`api_backend/`** foi removida.
+* Os ativos de conhecimento e especificação foram centralizados nas pastas **`base_conhecimento/`** e **`specs/`** na raiz.
