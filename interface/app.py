@@ -100,7 +100,8 @@ def invoke_agente(agente_id: str, pergunta: str):
         with open(caminho_do_dna, 'r', encoding='utf-8') as f:
             dna_do_agente = f.read()
     except FileNotFoundError:
-        return f"Erro: Agente com ID '{agente_id}' não encontrado em {caminho_do_dna}. Verifique se o nome do arquivo corresponde ao ID no código."
+        # CORREÇÃO: Mostra uma mensagem de erro mais clara e assume que a versão v1.1 é a correta
+        return f"Erro: Agente com ID '{agente_id}' não encontrado. O arquivo '{caminho_do_dna}' está faltando ou o ID está incorreto."
 
     prompt_template = dna_do_agente + "\n\nContexto: {context}\nPergunta: {question}\n\nSua Resposta:"
     QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt_template)
@@ -114,8 +115,8 @@ def invoke_agente(agente_id: str, pergunta: str):
     return resultado["result"]
 
 
-# ID: AGENTE_GERENTE_V3.2
-def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v3.2"):
+# ID CORRIGIDO: AGENTE_GERENTE_V3.1
+def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v3.1"):
     """
     Controla o fluxo principal: O Agente Gerente decide se responde ou delega.
     """
@@ -123,20 +124,21 @@ def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente
     
     decisao_bruta = invoke_agente(agente_id=orquestrador_id, pergunta=pergunta_usuario)
     
-    if DELEGATION_MARKER in decisao_bruta.upper():
+    if isinstance(decisao_bruta, str) and DELEGATION_MARKER in decisao_bruta.upper():
         try:
             agente_selecionado = decisao_bruta.split(DELEGATION_MARKER)[1].strip()
             agente_selecionado = agente_selecionado.replace(".", "").lower() 
             
             st.info(f"Gerente decidiu: Roteando para o **{agente_selecionado}**...")
             
+            # Executa a delegação
             resposta_final = invoke_agente(agente_id=agente_selecionado, pergunta=pergunta_usuario)
-            return resposta_final, agente_selecionado # Retorna a resposta e o ID do Agente
+            return resposta_final, agente_selecionado 
         except Exception:
             return decisao_bruta, orquestrador_id
     
     else:
-        return decisao_bruta, orquestrador_id # Retorna a resposta e o ID do Gerente
+        return decisao_bruta, orquestrador_id 
 
 
 # --- 3. LOOP PRINCIPAL DO STREAMLIT (INTERFACE) ---
@@ -153,13 +155,13 @@ def chat_interface():
 
     current_session_id = st.session_state["session_id"]
     
-    # ID: AGENTE_GERENTE_V3.2
-    AGENTE_GERENTE_ID = "agente_gerente_v3.2" 
+    # ID: AGENTE_GERENTE_V3.1
+    AGENTE_GERENTE_ID = "agente_gerente_v3.1" 
     
     # LISTA COMPLETA DOS 9 ESPECIALISTAS
     available_agentes = [
         "agente_arquiteto_web_v1",
-        "agente_briefing_v1.1",
+        "agente_briefing_v1", # Corrigido para ser buscado
         "agente_documentador_v1",
         "agente_lovable_prompter_v1",
         "agente_onboarding_v1",
@@ -209,7 +211,6 @@ def chat_interface():
                 speaking_agent_id = agente_override
             else:
                 # 2. ROTA DO GERENTE
-                # O processar_orquestrador agora retorna (resposta, agente_que_falou)
                 resposta_final, agente_falante_da_resposta = processar_orquestrador(prompt)
                 speaking_agent_id = agente_falante_da_resposta
         
