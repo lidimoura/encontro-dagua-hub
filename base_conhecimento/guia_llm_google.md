@@ -1,4 +1,4 @@
-# Guia Rápido: Google Gemini API
+# Guia Rápido: LLM Google Gemini API
 
 A Gemini API é a interface que permite ao nosso Hub interagir com os modelos de IA da Google. É o "cérebro" dos nossos Gems.
 
