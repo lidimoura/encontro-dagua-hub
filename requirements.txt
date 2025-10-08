@@ -3,4 +3,3 @@ langchain-openai
 supabase-py
 langchain-community
 chromadb
-unstructured
