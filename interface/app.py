@@ -6,7 +6,7 @@ from supabase import create_client, Client
 # IMPORTS DA STACK DE IA
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
-from langchain_community.document_loaders import UnstructuredFileLoader # NOVO: Loader para formatar o RAG
+from langchain_community.document_loaders import UnstructuredFileLoader 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
@@ -19,7 +19,6 @@ MEMORY_TABLE_NAME = "chat_memory"
 def init_supabase_client() -> Client:
     """Inicializa e armazena o cliente Supabase em cache."""
     try:
-        # Lendo os secrets (agora com o nome correto 'SUPABASE_URL')
         url: str = st.secrets["SUPABASE_URL"]
         key: str = st.secrets["SUPABASE_KEY"]
         return create_client(url, key)
@@ -56,7 +55,6 @@ def add_message_to_history(session_id: str, role: str, content: str):
 
 # --- 2. CORE DE IA RAG (OpenAI/Chroma) ---
 
-# Assumindo a organização final do seu repositório:
 CAMINHO_DO_CONHECIMENTO = "base_conhecimento/stack_atual_v2.md" 
 LLM_MODEL = "gpt-3.5-turbo"
 
@@ -69,13 +67,12 @@ def carregar_vector_store():
         return None
         
     try:
-        # CORREÇÃO FINAL: Usando o Loader para formatar o documento corretamente
+        # CORREÇÃO: Usando o Loader e garantindo que o Unstructured esteja instalado
         loader = UnstructuredFileLoader(CAMINHO_DO_CONHECIMENTO)
         documents = loader.load() 
         
-        # Divide os documentos em chunks
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-        chunks = text_splitter.split_documents(documents) # Note o uso de split_documents()
+        chunks = text_splitter.split_documents(documents) 
 
         embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
         vector_store = Chroma.from_documents(documents=chunks, embedding=embeddings)
@@ -83,6 +80,7 @@ def carregar_vector_store():
         print("✅ Vector Store (Chroma + OpenAI) pronto!")
         return vector_store
     except Exception as e:
+        # Se falhar aqui, o problema é na instalação do RAG ou no caminho do arquivo!
         st.error(f"Erro ao carregar o RAG: {e}") 
         return None
 
@@ -119,9 +117,9 @@ def invoke_agente(agente_id: str, pergunta: str):
     return resultado["result"]
 
 
-def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_orquestrador_v1"):
+def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v1"):
     """
-    Controla o fluxo principal: O Orquestrador decide se responde ou delega.
+    Controla o fluxo principal: O Agente Gerente decide se responde ou delega.
     """
     DELEGATION_MARKER = "DELEGAR:" 
     
@@ -137,9 +135,11 @@ def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente
             resposta_final = invoke_agente(agente_id=agente_selecionado, pergunta=pergunta_usuario)
             return resposta_final
         except Exception:
+            # Se a delegação falhar, retorna a resposta original do Gerente
             return decisao_bruta
     
     else:
+        # Se não houver DELEGAR, o próprio Gerente responde.
         return decisao_bruta
 
 
@@ -156,14 +156,16 @@ def chat_interface():
         return
 
     current_session_id = st.session_state["session_id"]
-    AGENTE_ORQUESTRADOR_ID = "agente_orquestrador_v1"
     
+    # NOME CORRIGIDO para o ID que você manteve:
+    AGENTE_GERENTE_ID = "agente_gerente_v1" 
+    
+    # Lista de Agentes disponíveis para o Override Manual (Ajustada para a sua lista atual)
     available_agentes = [
         "agente_qa_v2", 
         "agente_briefing_v1", 
-        "agente_financas_v1",
         "agente_documentador_v1",
-        "meta_agente_arquiteto_v1" # Adicionando o Meta-Agente para teste fácil!
+        "meta_agente_arquiteto_v1"
     ]
     
     with st.sidebar:
@@ -172,8 +174,8 @@ def chat_interface():
         
         agente_override = st.selectbox(
             "Forçar Especialista (Override):", 
-            [AGENTE_ORQUESTRADOR_ID] + available_agentes,
-            format_func=lambda x: f"Orquestrador Padrão" if x == AGENTE_ORQUESTRADOR_ID else x.replace("agente_", "").replace("_v1", "").replace("_v2", "").upper()
+            [AGENTE_GERENTE_ID] + available_agentes,
+            format_func=lambda x: f"Orquestrador Padrão (Gerente)" if x == AGENTE_GERENTE_ID else x.replace("agente_", "").replace("_v1", "").replace("_v2", "").upper()
         )
         
         if st.button("Limpar Histórico de Conversa (Memória)"):
@@ -197,7 +199,7 @@ def chat_interface():
 
         with st.spinner("Hub pensando..."):
             
-            if agente_override != AGENTE_ORQUESTRADOR_ID:
+            if agente_override != AGENTE_GERENTE_ID:
                 resposta_final = invoke_agente(agente_id=agente_override, pergunta=prompt)
             else:
                 resposta_final = processar_orquestrador(prompt)
