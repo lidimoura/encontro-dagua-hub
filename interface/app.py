@@ -114,7 +114,7 @@ def invoke_agente(agente_id: str, pergunta: str):
     return resultado["result"]
 
 
-# CORREÇÃO DEFINITIVA DO ID: AGENTE_GERENTE_V3.2
+# ID: AGENTE_GERENTE_V3.2
 def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v3.2"):
     """
     Controla o fluxo principal: O Agente Gerente decide se responde ou delega.
@@ -131,12 +131,12 @@ def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente
             st.info(f"Gerente decidiu: Roteando para o **{agente_selecionado}**...")
             
             resposta_final = invoke_agente(agente_id=agente_selecionado, pergunta=pergunta_usuario)
-            return resposta_final
+            return resposta_final, agente_selecionado # Retorna a resposta e o ID do Agente
         except Exception:
-            return decisao_bruta
+            return decisao_bruta, orquestrador_id
     
     else:
-        return decisao_bruta
+        return decisao_bruta, orquestrador_id # Retorna a resposta e o ID do Gerente
 
 
 # --- 3. LOOP PRINCIPAL DO STREAMLIT (INTERFACE) ---
@@ -153,7 +153,7 @@ def chat_interface():
 
     current_session_id = st.session_state["session_id"]
     
-    # ID: AGENTE_GERENTE_V3.1
+    # ID: AGENTE_GERENTE_V3.2
     AGENTE_GERENTE_ID = "agente_gerente_v3.2" 
     
     # LISTA COMPLETA DOS 9 ESPECIALISTAS
@@ -193,6 +193,7 @@ def chat_interface():
     # --- 5. TRATAMENTO DE NOVA PERGUNTA (Loop Principal) ---
     if prompt := st.chat_input("Pergunte ao Hub..."):
         
+        # A. Salva e Exibe a Pergunta do Usuário
         add_message_to_history(current_session_id, "user", prompt)
         
         with st.chat_message("user"):
@@ -200,15 +201,26 @@ def chat_interface():
 
         with st.spinner("Hub pensando..."):
             
+            speaking_agent_id = AGENTE_GERENTE_ID
+            
             if agente_override != AGENTE_GERENTE_ID:
+                # 1. ROTA DE OVERRIDE
                 resposta_final = invoke_agente(agente_id=agente_override, pergunta=prompt)
+                speaking_agent_id = agente_override
             else:
-                resposta_final = processar_orquestrador(prompt)
+                # 2. ROTA DO GERENTE
+                # O processar_orquestrador agora retorna (resposta, agente_que_falou)
+                resposta_final, agente_falante_da_resposta = processar_orquestrador(prompt)
+                speaking_agent_id = agente_falante_da_resposta
         
-        add_message_to_history(current_session_id, "assistant", resposta_final)
+        # B. CORREÇÃO DE UX E SUPABASE: Adiciona o ID do Agente falante à mensagem
+        labeled_resposta_final = f"**{speaking_agent_id.upper()}:** {resposta_final}"
+        
+        # C. Salva e Exibe a Resposta do Hub
+        add_message_to_history(current_session_id, "assistant", labeled_resposta_final)
         
         with st.chat_message("assistant"):
-            st.markdown(resposta_final)
+            st.markdown(labeled_resposta_final)
             
         st.rerun() 
 
