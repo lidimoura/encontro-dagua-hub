@@ -153,7 +153,7 @@ def chat_interface():
 
     current_session_id = st.session_state["session_id"]
     
-    # CORREÇÃO DO ID: AGENTE_GERENTE_V3.1
+    # ID: AGENTE_GERENTE_V3.1
     AGENTE_GERENTE_ID = "agente_gerente_v3.1" 
     
     # LISTA COMPLETA DOS 9 ESPECIALISTAS
