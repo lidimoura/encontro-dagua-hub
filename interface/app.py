@@ -102,7 +102,6 @@ def invoke_agente(agente_id: str, pergunta: str):
     except FileNotFoundError:
         return f"Erro: Agente com ID '{agente_id}' não encontrado em {caminho_do_dna}. Verifique se o nome do arquivo corresponde ao ID no código."
 
-# Nota: O Prompt Template precisa ser definido aqui para cada invocação
     prompt_template = dna_do_agente + "\n\nContexto: {context}\nPergunta: {question}\n\nSua Resposta:"
     QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt_template)
 
@@ -115,8 +114,8 @@ def invoke_agente(agente_id: str, pergunta: str):
     return resultado["result"]
 
 
-# ID: AGENTE_GERENTE_V3
-def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v3"):
+# CORREÇÃO DO ID AQUI: AGENTE_GERENTE_V3.1
+def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v3.1"):
     """
     Controla o fluxo principal: O Agente Gerente decide se responde ou delega.
     """
@@ -154,8 +153,8 @@ def chat_interface():
 
     current_session_id = st.session_state["session_id"]
     
-    # ID: AGENTE_GERENTE_V3
-    AGENTE_GERENTE_ID = "agente_gerente_v3" 
+    # CORREÇÃO DO ID AQUI: AGENTE_GERENTE_V3.1
+    AGENTE_GERENTE_ID = "agente_gerente_v3.1" 
     
     # LISTA COMPLETA DOS 9 ESPECIALISTAS (para a sidebar)
     available_agentes = [
@@ -177,7 +176,7 @@ def chat_interface():
         agente_override = st.selectbox(
             "Forçar Especialista (Override):", 
             [AGENTE_GERENTE_ID] + available_agentes,
-            format_func=lambda x: f"Gerente Padrão" if x == AGENTE_GERENTE_ID else x.replace("agente_", "").replace("_v1", "").replace("_v2", "").replace("v3", "").replace("meta_", "").replace(".", "").upper()
+            format_func=lambda x: f"Gerente Padrão" if x == AGENTE_GERENTE_ID else x.replace("agente_", "").replace("_v1", "").replace("_v2", "").replace("v3", "").replace("v3.1", "").replace("meta_", "").replace(".", "").upper()
         )
         
         if st.button("Limpar Histórico de Conversa (Memória)"):
