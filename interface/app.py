@@ -63,7 +63,7 @@ def add_message_to_history(session_id: str, role: str, content: str):
 # --- 2. CORE DE IA RAG (OpenAI/Chroma) ---
 
 # O caminho é relativo ao projeto no GitHub.
-CAMINHO_DO_CONHECIMENTO = "knowledge_base/stack_atual_v2.md"
+CAMINHO_DO_CONHECIMENTO = "base_conhecimento/stack_atual_v2.md"
 LLM_MODEL = "gpt-3.5-turbo"
 
 @st.cache_resource
