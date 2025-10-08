@@ -159,7 +159,7 @@ def chat_interface():
     # LISTA COMPLETA DOS 9 ESPECIALISTAS
     available_agentes = [
         "agente_arquiteto_web_v1",
-        "agente_briefing_v1",
+        "agente_briefing_v1.1",
         "agente_documentador_v1",
         "agente_lovable_prompter_v1",
         "agente_onboarding_v1",
