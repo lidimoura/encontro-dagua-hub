@@ -1,3 +1,10 @@
-openai
+# Versões mais antigas e estáveis para evitar bugs de ambiente
+langchain==0.1.13 
+
+# Instalação da integração com OpenAI (separada para isolar erros)
 langchain-openai
+openai
+pydantic==1.10.13
+
+# Resto do nosso stack
 supabase-py
