@@ -1,82 +1,38 @@
-# 📚 Stack Tecnológico e Diretrizes - Encontro D'Água Hub v2.0
+# Base de Conhecimento: Ecossistema Encontro D'Água Hub
 
-**Última Atualização:** 04 de outubro de 2025
+## Seção 1: Trajetória e Contexto da Arquiteta de Soluções (Lidi Moura)
 
-Este documento é a fonte oficial de verdade sobre as tecnologias utilizadas no ecossistema do Encontro D'Água Hub. Ele serve como base de conhecimento para todos os Gems e processos de desenvolvimento, garantindo que as ferramentas sejam utilizadas de forma consciente, sustentável e padronizada.
+Este contexto deve ser usado pelos Agentes para personalizar respostas, briefings e pitches.
 
----
+1.  **Identidade:** Lidi Moura, Arquiteta de Soluções de IA e Dev No-Code.
+2.  **Transição de Carreira:** Em transição de carreira, focada em soluções de sustentabilidade e projetos de impacto social.
+3.  **Localização:** Atua como parceira estratégica na startup Synk, em Manaus.
+4.  **Formação:**
+    * Programa ONE da Alura (com especialização em Data Science em andamento).
+    * Escola de Automação de Thales Laray.
+5.  **Status Legal:** Em processo de se tornar Pessoa Jurídica (PJ/MEI) para aderir ao Google Cloud Startup Program.
+6.  **Missão Social:** Projetar e entregar soluções tecnológicas acessíveis, com um forte compromisso com a diversidade e inclusão, oferecendo descontos sociais a grupos vulneráveis (mulheres, LGBTQIAPAN+, neurodivergentes, pais empreendedores, comunidades ribeirinhas, etc.).
 
-## 🏛️ Core do Hub (Desenvolvimento Principal)
+## Seção 2: Arquitetura e Stack Tecnológica do Hub (Pivô Final)
 
-Estas são as tecnologias centrais que formam a espinha dorsal do nosso software.
+O Hub passou por um pivô estratégico e agora opera na arquitetura "Tudo-em-Um".
 
-### Python
--   **Papel no Ecossistema:** A linguagem de programação fundamental para toda a nossa lógica de backend, automações e a inteligência dos Gems.
--   **Diretrizes de Uso:**
-    -   Utilizar sempre a versão 3.10 ou superior.
-    -   Todos os projetos devem usar ambientes virtuais (`.venv`).
-    -   O código deve ser formatado utilizando o `black` para manter a consistência.
-
-### FastAPI
--   **Papel no Ecossistema:** O framework Python que usamos para construir nosso "motor" (a API de backend). Ele é responsável por receber requisições, processar a lógica e se comunicar com os outros serviços.
--   **Diretrizes de Uso:**
-    -   Sempre utilizar `Pydantic` para validação de dados nas requisições e respostas.
-    -   Priorizar rotas assíncronas (`async def`) para melhor performance.
-
-### Google Gemini
--   **Papel no Ecossistema:** O cérebro generativo e a inteligência artificial por trás de todos os Gems. É a API que consultamos para obter respostas, análises e conteúdo.
--   **Diretrizes de Uso:**
-    -   Os prompts enviados ao Gemini devem seguir rigorosamente o blueprint ("DNA") do Gem especialista definido na pasta `/specs`.
-    -   O "Gem Gerente" pode escolher o modelo mais apropriado para a tarefa (ex: `flash` para rapidez, `pro` para complexidade) visando eficiência de custo.
-
-### Supabase
--   **Papel no Ecossistema:** Nossa memória persistente. É o banco de dados Postgres onde armazenamos o "Diário de Logs" (`gem_logs`) das interações dos Gems, permitindo aprendizado e consistência a longo prazo.
--   **Diretrizes de Uso:**
-    -   A interação deve ser feita via a biblioteca cliente do Python.
-    -   A RLS (Row-Level Security) deve ser mantida desativada para a API ter acesso total.
-
-### Streamlit & Lovable
--   **Papel no Ecossistema:** Nossas ferramentas de prototipagem e construção de interface (frontend).
--   **Diretrizes de Uso:**
-    -   **Streamlit:** Utilizado para criar painéis de controle internos e protótipos funcionais rápidos.
-    -   **Lovable:** Utilizado para prototipar interfaces mais complexas e visualmente elaboradas para apresentação e validação com clientes.
-
-### LangChain
--   **Papel no Ecossistema:** A "biblioteca" do nosso sistema. É o framework que conecta o Gemini à nossa base de conhecimento (`/base_conhecimento`), permitindo o processo de RAG (Retrieval-Augmented Generation).
--   **Diretrizes de Uso:**
-    -   Utilizar para carregar documentos, dividir textos (chunking) e criar as cadeias de busca de informação.
-
----
-
-## 🏗️ Infraestrutura e Deploy
-
-Ferramentas que suportam nosso desenvolvimento e colocam nosso projeto no ar.
-
-### Git & GitHub
--   **Papel no Ecossistema:** Nosso sistema de controle de versão e o hub central do nosso código (o monorepo `encontro-dagua-hub`).
--   **Diretrizes de Uso:**
-    -   Todo o desenvolvimento de novas funcionalidades acontece em branches separadas (como a `develop`).
-    -   A branch `main` é a versão estável ("Rio Negro"). As mudanças só são integradas via Pull Request.
-
-### Docker
--   **Papel no Ecossistema:** A nossa "fábrica de caixas". É a ferramenta que usamos para empacotar nossa API FastAPI em um contêiner padronizado, garantindo que ela rode da mesma forma em qualquer lugar.
-
-### Google Cloud Run
--   **Papel no Ecossistema:** A casa da nossa API. É a plataforma serverless onde nossa aplicação em contêiner (a "caixa" do Docker) é hospedada e executada.
-
-### Streamlit Community Cloud
--   **Papel no Ecossistema:** A casa da nossa interface. É a plataforma gratuita onde hospedamos nossa aplicação Streamlit.
-
----
-
-## 🛠️ Stack Estendido (Low-Code/No-Code)
-
-Estas são ferramentas adicionais do seu stack de trabalho. Os Gems devem estar cientes delas para dar suporte a projetos de clientes que as utilizem.
-
-### gptmaker, typebot, manychat
--   **Papel no Ecossistema:** Plataformas para criação de chatbots e fluxos conversacionais.
--   **Contexto:** Utilizadas principalmente em projetos de automação de atendimento para clientes.
-
-### Make (anteriormente Integromat)
--   **Papel no Ecossistema:** A "cola" de automação visual. É a principal ferramenta para integrar diferentes APIs e serviços sem a necessidade de código complexo.
-
+1.  **Nome do Projeto:** Encontro D'Água Hub.
+2.  **Objetivo:** Ecossistema de Agentes de IA ("Gems") para automatizar o fluxo de trabalho (briefing, QA, finanças, documentação, etc.) e entregar projetos a clientes.
+3.  **Arquitetura Atual:** **"Tudo-em-Um" (Monolítica Simples).**
+4.  **Interface/Deployment:**
+    * **Aplicação:** Aplicação Única Streamlit.
+    * **Hospedagem:** Streamlit Community Cloud.
+5.  **Cérebro (LLM):**
+    * **Motor:** API da **OpenAI** (Modelo: `gpt-3.5-turbo`).
+    * **Motivo:** Adotada devido a problemas de *deployment* e bloqueios com a API do Google Gemini.
+6.  **Sistema de Conhecimento (RAG):**
+    * **Framework:** **LangChain** (para construir cadeias de QA e roteamento).
+    * **Vetorização/Busca:** **ChromaDB** (como Vector Store local embutido).
+    * **Fonte da Verdade:** Este arquivo (`stack_atual_v2.md`).
+7.  **Memória Persistente:**
+    * **Tecnologia:** **Supabase** (usado para persistir o histórico de conversas na tabela `chat_memory`).
+8.  **Agentes Oficiais (Comunicação Robótica):**
+    * O Gerente Orquestrador utiliza o comando **DELEGAR:** seguido do ID exato.
+    * **Gerente/Orquestrador:** `agente_gerente_v3.1` (Versão de Lançamento).
+    * **Lista de Especialistas:** `agente_qa_v2`, `agente_briefing_v1`, `agente_documentador_v1`, `agente_arquiteto_web_v1`, `meta_agente_arquiteto_v1`, `guia_tecnico_v1`, `agente_lovable_prompter_v1`, `agente_onboarding_v1`, `agente_revisor_entrega_v1`.
