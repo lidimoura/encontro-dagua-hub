@@ -1,3 +1,7 @@
 openai
 langchain-openai
 supabase-py
+# Componentes necessários para o RAG (Vector Store e Splitter)
+langchain-community
+chroma
+unstructured
