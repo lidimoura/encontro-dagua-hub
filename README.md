@@ -81,7 +81,8 @@ O Rosto (Interface): Um painel de controle interativo para gerenciar e interagir
   ├── 📄 Dockerfile
   ├── 📄 requirements.txt      
   ├── 📄 README.md
-  └── 📄 LICENSE  ```
+  └── 📄 LICENSE  
+  ```
 
 <h3 align= "center"> Como Começar </h3>
 <div align= "center"> O projeto está em desenvolvimento ativo. Para configurar o ambiente localmente, siga os passos abaixo: </div>
