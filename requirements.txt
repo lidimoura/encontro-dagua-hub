@@ -5,7 +5,9 @@ langchain-openai
 # CORRIGIDO: Nome correto da biblioteca Supabase
 supabase
 
-# Módulos do RAG (Chroma e Processamento de Texto)
+# Módulos do RAG
 chromadb
 langchain-community
-unstructured
+
+# CORREÇÃO FINAL: Instalar o Unstructured com a dependência para Markdown (necessária para ler o .md)
+unstructured[md]
