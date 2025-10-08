@@ -14,7 +14,7 @@ if SUPABASE_URL and SUPABASE_KEY:
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 st.title("💧 Painel de Comando do Encontro D'Água Hub")
-API_BASE_URL = "https://encontro-dagua-hub-api-192934687919.southamerica-east1.run.app"
+API_BASE_URL = "https://bc1cc700cdc7.ngrok-free.app"
 
 with st.sidebar:
     st.header("Equipe de Gems")
