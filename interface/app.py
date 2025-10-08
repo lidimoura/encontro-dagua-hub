@@ -102,6 +102,7 @@ def invoke_agente(agente_id: str, pergunta: str):
     except FileNotFoundError:
         return f"Erro: Agente com ID '{agente_id}' não encontrado em {caminho_do_dna}. Verifique se o nome do arquivo corresponde ao ID no código."
 
+# Nota: O Prompt Template precisa ser definido aqui para cada invocação
     prompt_template = dna_do_agente + "\n\nContexto: {context}\nPergunta: {question}\n\nSua Resposta:"
     QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt_template)
 
@@ -143,7 +144,7 @@ def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente
 
 def chat_interface():
     
-    # CORREÇÃO DO BRANDING (EMOJI) AQUI
+    # BRANDING FINAL: Emojis e títulos
     st.set_page_config(page_title="🌀 Encontro D'Água Hub", layout="wide")
     st.title("🌀 Encontro D'Água Hub - Orquestrador de Soluções")
     
@@ -156,15 +157,20 @@ def chat_interface():
     # ID: AGENTE_GERENTE_V3
     AGENTE_GERENTE_ID = "agente_gerente_v3" 
     
+    # LISTA COMPLETA DOS 9 ESPECIALISTAS (para a sidebar)
     available_agentes = [
-        "agente_qa_v2", 
-        "agente_briefing_v1", 
+        "agente_arquiteto_web_v1",
+        "agente_briefing_v1",
         "agente_documentador_v1",
+        "agente_lovable_prompter_v1",
+        "agente_onboarding_v1",
+        "agente_qa_v2", 
+        "agente_revisor_entrega_v1",
+        "guia_tecnico_v1",
         "meta_agente_arquiteto_v1"
     ]
     
     with st.sidebar:
-        # CORREÇÃO ESTÉTICA: REMOVENDO O EMOJI 🛠️ (mantendo o que você fez)
         st.subheader("Controles do Hub (Arquiteta)")
         st.write(f"ID da Sessão: `{current_session_id[:8]}...`")
         
