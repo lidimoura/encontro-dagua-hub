@@ -115,8 +115,8 @@ def invoke_agente(agente_id: str, pergunta: str):
     return resultado["result"]
 
 
-# ID CORRIGIDO: AGENTE_GERENTE_V3.1
-def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v3.1"):
+# ID CORRIGIDO: AGENTE_GERENTE_V3.2
+def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v3.2"):
     """
     Controla o fluxo principal: O Agente Gerente decide se responde ou delega.
     """
@@ -155,13 +155,13 @@ def chat_interface():
 
     current_session_id = st.session_state["session_id"]
     
-    # ID: AGENTE_GERENTE_V3.1
-    AGENTE_GERENTE_ID = "agente_gerente_v3.1" 
+    # ID: AGENTE_GERENTE_V3.2
+    AGENTE_GERENTE_ID = "agente_gerente_v3.2" 
     
     # LISTA COMPLETA DOS 9 ESPECIALISTAS
     available_agentes = [
         "agente_arquiteto_web_v1",
-        "agente_briefing_v1", # Corrigido para ser buscado
+        "agente_briefing_v1.1",
         "agente_documentador_v1",
         "agente_lovable_prompter_v1",
         "agente_onboarding_v1",
