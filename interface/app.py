@@ -114,8 +114,8 @@ def invoke_agente(agente_id: str, pergunta: str):
     return resultado["result"]
 
 
-# CORREÇÃO DO ID AQUI: AGENTE_GERENTE_V2.2
-def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v2.2"):
+# CORREÇÃO DO ID AQUI: AGENTE_GERENTE_V3
+def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v3"):
     """
     Controla o fluxo principal: O Agente Gerente decide se responde ou delega.
     """
@@ -152,8 +152,8 @@ def chat_interface():
 
     current_session_id = st.session_state["session_id"]
     
-    # CORREÇÃO DO ID AQUI: AGENTE_GERENTE_V2.2
-    AGENTE_GERENTE_ID = "agente_gerente_v2.2" 
+    # CORREÇÃO DO ID AQUI: AGENTE_GERENTE_V3
+    AGENTE_GERENTE_ID = "agente_gerente_v3" 
     
     available_agentes = [
         "agente_qa_v2", 
@@ -170,7 +170,7 @@ def chat_interface():
             "Forçar Especialista (Override):", 
             [AGENTE_GERENTE_ID] + available_agentes,
             # CORREÇÃO DA INTERFACE AQUI: Gerente Padrão
-            format_func=lambda x: f"Gerente Padrão" if x == AGENTE_GERENTE_ID else x.replace("agente_", "").replace("_v1", "").replace("_v2", "").upper().replace("2.2", "").replace(".", "")
+            format_func=lambda x: f"Gerente Padrão" if x == AGENTE_GERENTE_ID else x.replace("agente_", "").replace("_v1", "").replace("_v2", "").replace("v3", "").replace(".", "").upper()
         )
         
         if st.button("Limpar Histórico de Conversa (Memória)"):
