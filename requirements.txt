@@ -1,10 +1,11 @@
-# Versões mais antigas e estáveis para evitar bugs de ambiente
-langchain==0.1.13 
-
-# Instalação da integração com OpenAI (separada para isolar erros)
-langchain-openai
+# Módulos Core do Hub (LLM e Memória)
 openai
-pydantic==1.10.13
+langchain-openai
 
-# Resto do nosso stack
-supabase-py
+# CORRIGIDO: Nome correto da biblioteca Supabase
+supabase
+
+# Módulos do RAG (Chroma e Processamento de Texto)
+chromadb
+langchain-community
+unstructured
