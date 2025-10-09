@@ -12,20 +12,12 @@ from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
 # --- 1. CONFIGURAÇÃO GERAL DO HUB ---
-# ATUALIZADO: Centralizamos todas as configurações aqui, refletindo o stack_atual_v3.md
-
-# Fonte da Verdade para o RAG
 CAMINHO_DO_CONHECIMENTO = "base_conhecimento/stack_atual_v3.md"
-
-# Configuração da Memória
 MEMORY_TABLE_NAME = "chat_memory"
-
-# Configuração do LLM
 LLM_MODEL = "gpt-3.5-turbo"
 
 # --- CONFIGURAÇÃO DOS AGENTES ---
-# ATUALIZADO: Lista final de agentes conforme a nossa nova arquitetura.
-AGENTE_GERENTE_ID = "agente_gerente_v3.4"
+AGENTE_GERENTE_ID = "agente_gerente_v4"
 ESPECIALISTAS_IDS = [
     "agente_briefing_v2.1",
     "agente_tecnico_v2",
@@ -128,7 +120,6 @@ def invoke_agente(agente_id: str, pergunta: str, history_str: str = ""):
     if not retriever:
         return "Erro: Sistema de conhecimento (RAG) não inicializado."
         
-    # ATUALIZADO: O nome do arquivo agora é ajustado para a nossa convenção
     caminho_do_dna = f"specs/{agente_id.split('_v')[0]}_v{agente_id.split('_v')[1].split('.')[0]}.md"
 
     try:
@@ -163,13 +154,11 @@ def processar_orquestrador(pergunta_usuario: str, history_str: str):
         try:
             agente_selecionado = decisao_bruta.split(DELEGATION_MARKER)[1].strip().lower()
             
-            # NOVO: Adiciona uma camada de segurança, validando se o agente delegado existe na nossa lista oficial
             if agente_selecionado in ESPECIALISTAS_IDS:
                 st.info(f"Gerente decidiu: Roteando para o **{agente_selecionado}**...")
                 resposta_final = invoke_agente(agente_id=agente_selecionado, pergunta=pergunta_usuario, history_str=history_str)
                 return resposta_final, agente_selecionado
             else:
-                # Se o Gerente delegar para um agente inválido, ele mesmo assume a resposta
                 return f"(Alerta: O Gerente tentou delegar para um agente inválido: '{agente_selecionado}'. Assumindo a resposta.)\n{decisao_bruta}", AGENTE_GERENTE_ID
         except Exception:
             return decisao_bruta, AGENTE_GERENTE_ID
@@ -180,10 +169,9 @@ def processar_orquestrador(pergunta_usuario: str, history_str: str):
 # --- 5. LOOP PRINCIPAL DO STREAMLIT (INTERFACE) ---
 
 def formatar_nome_agente_para_exibicao(agente_id: str) -> str:
-    """NOVO: Função para limpar os nomes dos agentes para a UI."""
+    """Função para limpar os nomes dos agentes para a UI."""
     if agente_id == AGENTE_GERENTE_ID:
-        return "Gerente Padrão"
-    # Remove prefixo, versão e underscores para uma leitura mais limpa
+        return "Gerente Padrão (Guia)"
     return agente_id.replace("agente_", "").replace("_", " ").split(' v')[0].title()
 
 def chat_interface():
@@ -191,4 +179,55 @@ def chat_interface():
     st.title("🌀 Encontro D'Água Hub - Orquestrador de Soluções")
     
     if not vector_store:
-        st.error
+        st.error("O Hub não pôde inicializar. Verifique o caminho do arquivo de conhecimento.")
+        return
+
+    with st.sidebar:
+        st.subheader("Controles do Hub (Arquiteta)")
+        st.write(f"ID da Sessão: `{current_session_id[:8]}...`")
+        
+        agente_override = st.selectbox(
+            "Forçar Especialista (Override):",
+            [AGENTE_GERENTE_ID] + ESPECIALISTAS_IDS,
+            format_func=formatar_nome_agente_para_exibicao
+        )
+        
+        if st.button("Limpar Histórico de Conversa (Memória)"):
+            if supabase:
+                supabase.table(MEMORY_TABLE_NAME).delete().eq("session_id", current_session_id).execute()
+                st.rerun()
+
+    raw_history = get_chat_history(current_session_id)
+    for message in raw_history:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    if prompt := st.chat_input("Pergunte ao Hub..."):
+        history_for_llm = format_history_for_llm(raw_history)
+        
+        add_message_to_history(current_session_id, "user", prompt)
+        
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        with st.spinner("Hub pensando..."):
+            speaking_agent_id = AGENTE_GERENTE_ID
+            
+            if agente_override != AGENTE_GERENTE_ID:
+                resposta_final = invoke_agente(agente_id=agente_override, pergunta=prompt, history_str=history_for_llm)
+                speaking_agent_id = agente_override
+            else:
+                resposta_final, speaking_agent_id = processar_orquestrador(prompt, history_for_llm)
+        
+        labeled_resposta_final = f"**{speaking_agent_id.upper()}:** {resposta_final}"
+        
+        add_message_to_history(current_session_id, "assistant", labeled_resposta_final)
+        
+        with st.chat_message("assistant"):
+            st.markdown(labeled_resposta_final)
+            
+        st.rerun()
+
+# --- EXECUÇÃO FINAL ---
+if __name__ == "__main__":
+    chat_interface()
