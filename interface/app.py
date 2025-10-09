@@ -17,7 +17,7 @@ MEMORY_TABLE_NAME = "chat_memory"
 LLM_MODEL = "gpt-3.5-turbo"
 
 # --- CONFIGURAÇÃO DOS AGENTES ---
-AGENTE_GERENTE_ID = "agente_gerente_v4"
+AGENTE_GERENTE_ID = "agente_gerente_v4.1"
 ESPECIALISTAS_IDS = [
     "agente_briefing_v2.2",
     "agente_tecnico_v2",
