@@ -28,9 +28,9 @@
 
 ## Seção 4: Agentes Oficiais e Versões Atuais
 
-* **Gerente/Orquestrador:** `agente_gerente_v4.0`
+* **Gerente/Orquestrador:** `agente_gerente_v4`
 * **Especialistas:**
-    * `agente_briefing_v2.1`
+    * `agente_briefing_v2.2`
     * `agente_tecnico_v2`
     * `agente_arquiteto_ia_v2`
     * `agente_arquiteto_web_v2`
@@ -40,3 +40,4 @@
     * `agente_revisor_entrega_v2`
     * `agente_documentador_v2`
     * `meta_agente_arquiteto_v2`
+
