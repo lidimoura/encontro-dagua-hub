@@ -53,6 +53,20 @@ def add_message_to_history(session_id: str, role: str, content: str):
         }
         supabase.table(MEMORY_TABLE_NAME).insert(data).execute()
 
+# NOVO: Função que formata o histórico para ser usado no Prompt
+def format_history_for_llm(messages: list[dict]) -> str:
+    """Converte o histórico do Supabase para um formato de string que o LLM pode usar."""
+    history_str = ""
+    for msg in messages:
+        # Remove o prefixo do Agente para o LLM não se confundir
+        content = msg['content'].split(':', 1)[-1].strip() if msg['role'] == 'assistant' and ':' in msg['content'] else msg['content']
+        
+        if msg["role"] == "user":
+            history_str += f"HUMANO: {content}\n"
+        elif msg["role"] == "assistant":
+            history_str += f"ASSISTENTE: {content}\n"
+    return history_str
+
 # --- 2. CORE DE IA RAG (OpenAI/Chroma) ---
 
 CAMINHO_DO_CONHECIMENTO = "base_conhecimento/stack_atual_v2.md" 
@@ -87,9 +101,10 @@ llm = ChatOpenAI(model=LLM_MODEL, temperature=0.5)
 
 # --- LÓGICA DE INVOCAÇÃO DOS AGENTES (ESPECIALISTAS) ---
 
-def invoke_agente(agente_id: str, pergunta: str):
+# CORREÇÃO: invoke_agente agora aceita o history_str
+def invoke_agente(agente_id: str, pergunta: str, history_str: str = ""):
     """
-    Função que busca o DNA do Agente (Especialista) e executa a cadeia RAG/QA.
+    Função que busca o DNA do Agente (Especialista), executa a cadeia RAG/QA e injeta o histórico.
     """
     if not retriever:
          return "Erro: Sistema de conhecimento (RAG) não inicializado. Não é possível invocar o Agente."
@@ -100,10 +115,13 @@ def invoke_agente(agente_id: str, pergunta: str):
         with open(caminho_do_dna, 'r', encoding='utf-8') as f:
             dna_do_agente = f.read()
     except FileNotFoundError:
-        # CORREÇÃO: Mostra uma mensagem de erro mais clara e assume que a versão v1.1 é a correta
-        return f"Erro: Agente com ID '{agente_id}' não encontrado. O arquivo '{caminho_do_dna}' está faltando ou o ID está incorreto."
+        return f"Erro: Agente com ID '{agente_id}' não encontrado em {caminho_do_dna}. Verifique se o nome do arquivo corresponde ao ID no código."
 
-    prompt_template = dna_do_agente + "\n\nContexto: {context}\nPergunta: {question}\n\nSua Resposta:"
+    # CORREÇÃO: Injeta o histórico da conversa no Prompt Template
+    prompt_template = dna_do_agente + (
+        "\n\nHistórico da Conversa:\n" + history_str + "\n\n" if history_str else "\n\n"
+    ) + "Contexto: {context}\nPergunta: {question}\n\nSua Resposta:"
+    
     QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt_template)
 
     qa_chain = RetrievalQA.from_chain_type(
@@ -115,14 +133,15 @@ def invoke_agente(agente_id: str, pergunta: str):
     return resultado["result"]
 
 
-# ID CORRIGIDO: AGENTE_GERENTE_V3.2
-def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente_gerente_v3.2"):
+# CORREÇÃO: processar_orquestrador agora aceita o history_str
+def processar_orquestrador(pergunta_usuario: str, history_str: str, orquestrador_id: str = "agente_gerente_v3.1"):
     """
-    Controla o fluxo principal: O Agente Gerente decide se responde ou delega.
+    Controla o fluxo principal: O Agente Gerente decide se responde ou delega, usando o histórico.
     """
     DELEGATION_MARKER = "DELEGAR:" 
     
-    decisao_bruta = invoke_agente(agente_id=orquestrador_id, pergunta=pergunta_usuario)
+    # CORREÇÃO: Passa o histórico na invocação
+    decisao_bruta = invoke_agente(agente_id=orquestrador_id, pergunta=pergunta_usuario, history_str=history_str)
     
     if isinstance(decisao_bruta, str) and DELEGATION_MARKER in decisao_bruta.upper():
         try:
@@ -131,8 +150,8 @@ def processar_orquestrador(pergunta_usuario: str, orquestrador_id: str = "agente
             
             st.info(f"Gerente decidiu: Roteando para o **{agente_selecionado}**...")
             
-            # Executa a delegação
-            resposta_final = invoke_agente(agente_id=agente_selecionado, pergunta=pergunta_usuario)
+            # CORREÇÃO: Passa o histórico na delegação
+            resposta_final = invoke_agente(agente_id=agente_selecionado, pergunta=pergunta_usuario, history_str=history_str)
             return resposta_final, agente_selecionado 
         except Exception:
             return decisao_bruta, orquestrador_id
@@ -160,15 +179,9 @@ def chat_interface():
     
     # LISTA COMPLETA DOS 9 ESPECIALISTAS
     available_agentes = [
-        "agente_arquiteto_web_v1",
-        "agente_briefing_v1.1",
-        "agente_documentador_v1",
-        "agente_lovable_prompter_v1",
-        "agente_onboarding_v1",
-        "agente_qa_v2", 
-        "agente_revisor_entrega_v1",
-        "guia_tecnico_v1",
-        "meta_agente_arquiteto_v1"
+        "agente_arquiteto_web_v1", "agente_briefing_v1.1", "agente_documentador_v1", 
+        "agente_lovable_prompter_v1", "agente_onboarding_v1", "agente_qa_v2", 
+        "agente_revisor_entrega_v1", "guia_tecnico_v1", "meta_agente_arquiteto_v1"
     ]
     
     with st.sidebar:
@@ -186,14 +199,17 @@ def chat_interface():
             st.rerun()
 
     # --- 4. EXIBIÇÃO DO HISTÓRICO (Memória) ---
-    messages = get_chat_history(current_session_id)
+    raw_history = get_chat_history(current_session_id)
     
-    for message in messages:
+    for message in raw_history:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
     # --- 5. TRATAMENTO DE NOVA PERGUNTA (Loop Principal) ---
     if prompt := st.chat_input("Pergunte ao Hub..."):
+        
+        # CORREÇÃO: Formata o histórico do Supabase para o LLM
+        history_for_llm = format_history_for_llm(raw_history)
         
         # A. Salva e Exibe a Pergunta do Usuário
         add_message_to_history(current_session_id, "user", prompt)
@@ -207,11 +223,13 @@ def chat_interface():
             
             if agente_override != AGENTE_GERENTE_ID:
                 # 1. ROTA DE OVERRIDE
-                resposta_final = invoke_agente(agente_id=agente_override, pergunta=prompt)
+                # CORREÇÃO: Passa o histórico na invocação
+                resposta_final = invoke_agente(agente_id=agente_override, pergunta=prompt, history_str=history_for_llm)
                 speaking_agent_id = agente_override
             else:
                 # 2. ROTA DO GERENTE
-                resposta_final, agente_falante_da_resposta = processar_orquestrador(prompt)
+                # CORREÇÃO: Passa o histórico no processamento
+                resposta_final, agente_falante_da_resposta = processar_orquestrador(prompt, history_for_llm)
                 speaking_agent_id = agente_falante_da_resposta
         
         # B. CORREÇÃO DE UX E SUPABASE: Adiciona o ID do Agente falante à mensagem
