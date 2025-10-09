@@ -34,8 +34,8 @@
     * `agente_tecnico_v2`
     * `agente_arquiteto_ia_v2`
     * `agente_arquiteto_web_v2`
-    * `agente_qa_v3`
-    * `agente_onboarding_v2`
+    * `agente_qa_v2.1`
+    * * `agente_onboarding_v2`
     * `agente_lovable_prompter_v2`
     * `agente_revisor_entrega_v2`
     * `agente_documentador_v2`
