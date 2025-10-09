@@ -134,7 +134,7 @@ def invoke_agente(agente_id: str, pergunta: str, history_str: str = ""):
 
 
 # CORREÇÃO: processar_orquestrador agora aceita o history_str
-def processar_orquestrador(pergunta_usuario: str, history_str: str, orquestrador_id: str = "agente_gerente_v3.2"):
+def processar_orquestrador(pergunta_usuario: str, history_str: str, orquestrador_id: str = "agente_gerente_v3.3"):
     """
     Controla o fluxo principal: O Agente Gerente decide se responde ou delega, usando o histórico.
     """
@@ -174,8 +174,8 @@ def chat_interface():
 
     current_session_id = st.session_state["session_id"]
     
-    # ID: AGENTE_GERENTE_V3.2
-    AGENTE_GERENTE_ID = "agente_gerente_v3.2" 
+    # ID: AGENTE_GERENTE_V3.3
+    AGENTE_GERENTE_ID = "agente_gerente_v3.3" 
     
     # LISTA COMPLETA DOS 9 ESPECIALISTAS
     available_agentes = [
