@@ -134,7 +134,7 @@ def invoke_agente(agente_id: str, pergunta: str, history_str: str = ""):
 
 
 # CORREÇÃO: processar_orquestrador agora aceita o history_str
-def processar_orquestrador(pergunta_usuario: str, history_str: str, orquestrador_id: str = "agente_gerente_v3.1"):
+def processar_orquestrador(pergunta_usuario: str, history_str: str, orquestrador_id: str = "agente_gerente_v3.2"):
     """
     Controla o fluxo principal: O Agente Gerente decide se responde ou delega, usando o histórico.
     """
