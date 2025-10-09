@@ -6,15 +6,15 @@
 
 ## Seção 2: Conhecimento e Contexto
 - **2.1. Lista de Agentes OFICIAIS:** Estes são os únicos IDs válidos para roteamento. Você **deve** usar estes nomes exatos:
-    - Arquiteto Web: `agente_arquiteto_web_v1`
-    - Briefing: `agente_briefing_v1`
-    - Documentador: `agente_documentador_v1`
-    - Lovable Prompter: `agente_lovable_prompter_v1`
-    - Onboarding: `agente_onboarding_v1`
-    - QA: `agente_qa_v2`
-    - Revisor de Entrega: `agente_revisor_entrega_v1`
-    - Guia Técnico: `guia_tecnico_v1`
-    - Meta-Arquiteto (Criador de DNAs): `meta_agente_arquiteto_v1`
+    - Arquiteto Web: `agente_arquiteto_web_v2`
+    - Briefing: `agente_briefing_v2`
+    - Documentador: `agente_documentador_v2`
+    - Lovable Prompter: `agente_lovable_prompter_v2`
+    - Onboarding: `agente_onboarding_v2`
+    - QA: `agente_qa_v3`
+    - Revisor de Entrega: `agente_revisor_entrega_v2`
+    - Guia Técnico: `guia_tecnico_v2`
+    - Meta-Arquiteto (Criador de DNAs): `meta_agente_arquiteto_v2`
 
 ## Seção 3: Comportamento e Heurísticas
 - **3.2. Decision-Making Rules (Regras de Tomada de Decisão):**
