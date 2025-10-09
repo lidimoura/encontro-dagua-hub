@@ -1,19 +1,19 @@
 <div align="center">
 
-# Encontro d'água hub 
+# Encontro d'água hub 🌀
 Onde tecnologia e sustentabilidade se encontram. Este repositório é o coração do nosso ecossistema de agentes de IA, construído com a filosofia de "reflorestar o digital".
 
 </div>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Status-Em%20Desenvolvimento-778899" alt="Status do Projeto">
-  <img src="https://img.shields.io/badge/Linguagem-Python-556B2F?logo=python&logoColor=white" alt="Linguagem Principal">
-  <img src="https://img.shields.io/badge/Backend-FastAPI-556B2F?logo=fastapi&logoColor=white" alt="Backend">
-  <img src="https://img.shields.io/badge/Database-Supabase-A0522D?logo=supabase&logoColor=white" alt="Database">
-  <img src="https://img.shields.io/badge/AI-Google%20Gemini-C46210?logo=google&logoColor=white" alt="IA Generativa">
-  <a href="LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="Licença">
-  </a>
+  <img src="https://img.shields.io/badge/Status-LANÇADO-28A745" alt="Status do Projeto">
+  <img src="https://img.shields.io/badge/Linguagem-Python-556B2F?logo=python&logoColor=white" alt="Linguagem Principal">
+  <img src="https://img.shields.io/badge/Backend-Streamlit-556B2F?logo=streamlit&logoColor=white" alt="Backend">
+  <img src="https://img.shields.io/badge/Database-Supabase-A0522D?logo=supabase&logoColor=white" alt="Database">
+  <img src="https://img.shields.io/badge/AI-OpenAI-000000?logo=openai&logoColor=white" alt="IA Generativa">
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="Licença">
+  </a>
 </p>
 
 <p align="center">
@@ -28,22 +28,19 @@ Onde tecnologia e sustentabilidade se encontram. Este repositório é o coraçã
 </p>
 
 <h3 align= "center"> Sobre o Projeto </h3>
-<div align= "center">Em um mundo digital que cresce exponencialmente, o Encontro D'Água Hub nasce com um propósito: criar tecnologia de forma sustentável. Assim como na natureza, onde nada se perde e tudo se transforma, nosso objetivo é construir um ecossistema de "Gems" (nossos agentes de IA) que sejam eficientes, que reaproveitem conhecimento e que não gerem "lixo digital".
+<div align= "center">Em um mundo digital que cresce exponencialmente, o Encontro D'Água Hub nasce com um propósito: criar tecnologia de forma sustentável. Assim como na natureza, onde nada se perde e tudo se transforma, nosso objetivo é construir um ecossistema de Agentes de IA que sejam eficientes, que reaproveitem conhecimento e que não gerem "lixo digital".
 
 Este projeto, inspirado no encontro das águas dos rios Negro e Solimões em Manaus, busca automatizar, otimizar e criar, mas sempre com a consciência do impacto e com a beleza da colaboração. </div>
 
 <h3 align= "center"> Arquitetura do Hub </h3>
-<div align= "center">Este projeto é um monorepo que centraliza todo o ecossistema de Gems. A arquitetura é baseada em três pilares principais:
+<div align= "center">Este projeto agora opera na arquitetura **"Tudo-em-Um" (Monolítica Simples)**. Após o pivô estratégico, toda a lógica do Hub está consolidada em uma única aplicação Streamlit, eliminando a complexidade de microsserviços. A arquitetura é baseada em três pilares principais:
 
-O Cérebro (Backend API): Uma API em FastAPI que serve como o ponto central para invocar os Gems, orquestrando toda a lógica.
+O Cérebro & Rosto: O arquivo `interface/app.py` no Streamlit Cloud concentra toda a lógica de execução e a interface de usuário.
 
-A Memória (RAG & Supabase): Nossos Gems evoluem através de:
+A Inteligência (LLM & RAG): Utilizamos a API da **OpenAI** (GPT-3.5-Turbo) como motor principal, e **LangChain** para orquestrar o RAG (Retrieval-Augmented Generation) com a base de conhecimento.
 
-RAG (Retrieval-Augmented Generation): Uma base de conhecimento com documentações que os Gems consultam para dar respostas contextualizadas.
+A Memória Persistente: **Supabase** é o nosso banco de dados PostgreSQL que registra as interações (`chat_memory`), permitindo aprendizado contínuo e auditoria. </div>
 
-Memória Persistente: Um "Diário de Logs" no Supabase que registra as interações, permitindo aprendizado contínuo.
-
-O Rosto (Interface): Um painel de controle interativo para gerenciar e interagir com os Gems. </div>
 
 <h3 align= "center"> Tecnologias Utilizadas </h3>
 <div align= "justify">
@@ -58,34 +55,26 @@ O Rosto (Interface): Um painel de controle interativo para gerenciar e interagir
 -   **Versionamento:** ![Git](https://img.shields.io/badge/Git-778899?style=for-the-badge&logo=git&logoColor=white) & ![GitHub](https://img.shields.io/badge/GitHub-778899?style=for-the-badge&logo=github&logoColor=white)
 -   **Automação (CI/CD):** ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-778899?style=for-the-badge&logo=githubactions&logoColor=white)</div>
 
+
 <h3 align= "center"> 📁 Estrutura do Repositório </h3>
 
 ```bash
 ## 📁 Estrutura do Repositório
 
 /encontro-dagua-hub
-  ├── 📂 api_backend/
-  │   ├── 📂 base_conhecimento/
-  │   │   ├── 📄 stack_atual_v2.md
-  │   │   └── ... (outros guias .md)
-  │   ├── 📄 main.py
-  │   └── 📄 requirements.txt
-  ├── 📂 interface/
-  │   └── 📄 app.py
-  ├── 📂 specs/
-  │   └── ... (todos os DNAs dos Gems .md)
-  ├── 📂 fontes/
-  │   └── ... (documentos de pesquisa para o NotebookLM)
-  ├── 📂 prompts/
-  │   └── ... (nossos prompts mestres salvos)
-  ├── 📄 Dockerfile
-  ├── 📄 requirements.txt      
-  ├── 📄 README.md
-  └── 📄 LICENSE  
-  ```
+  ├── 📂 interface/             <-- (O cérebro do hub)
+  │   └── 📄 app.py
+  ├── 📂 specs/                 <-- Contém todos os DNAs dos agentes especialistas (.md)
+  ├── 📂 base_conhecimento/      <-- As bases de conhecimento (RAG) e guias do hub
+  ├── 📄 requirements.txt
+  ├── 📄 gemini.md              <-- Dossiê da evolução e processos do hub
+  ├── 📄 README.md
+  └── 📄 LICENSE  
+ ```
 
 <h3 align= "center"> Como Começar </h3>
-<div align= "center"> O projeto está em desenvolvimento ativo. Para configurar o ambiente localmente, siga os passos abaixo: </div>
+<div align= "center"> O projeto está **LANÇADO** e rodando no Streamlit Cloud. Para configurar o ambiente localmente (caso necessário): </div>
+
 
 ``` bash
 
