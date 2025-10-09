@@ -108,9 +108,17 @@ Após a saga de debugging com o deploy no Google Cloud Run e a descoberta de um 
 
 Este capítulo registra as últimas correções de versionamento e lógica de Agentes para o lançamento.
 
-1.  **Versionamento do Orquestrador:** O ID do Agente Gerente foi unificado para **`agente_gerente_v3.1`** tanto no DNA (`specs/`) quanto no código Python (`app.py`), resolvendo o erro de `FileNotFoundError`.
+1.  **Versionamento do Orquestrador:** O ID do Agente Gerente foi unificado para **`agente_gerente_v3.1`** no código e no DNA, resolvendo o erro de `FileNotFoundError` (A versão **`v3.2`** é a que lançou o Hub, corrigindo a alucinação de IDs).
 2.  **RAG (Sistema de Conhecimento):** O *bug* `page_content` foi resolvido com a implementação do **`UnstructuredFileLoader`** para leitura correta de arquivos `.md`.
 3.  **Core Dependências:** O `requirements.txt` foi corrigido para usar a nomenclatura padrão **`supabase`** (resolvendo o erro `supabase-py`) e adicionando a dependência `unstructured[md]`.
-4.  **Agente Gerente (Lógica):** O DNA foi atualizado com a **REGRA DE ROTEAMENTO ROBÓTICO**, instruindo o Agente Gerente a responder com **APENAS** o comando `DELEGAR: [ID]` para evitar conversas excessivas (falha de execução) e garantir o roteamento correto pelo código.
+4.  **Agente Gerente (Lógica):** O DNA foi atualizado com a **REGRA DE ROTEAMENTO ROBÓTICO**, instruindo o Agente Gerente a responder com **APENAS** o comando `DELEGAR: [ID]` para evitar falhas de execução.
 
 O Hub está oficialmente lançado na arquitetura "Tudo-em-Um" e pronto para a produção.
+
+
+
+
+
+
+
+
