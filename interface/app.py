@@ -16,6 +16,8 @@ CAMINHO_DO_CONHECIMENTO = "base_conhecimento/stack_atual_v3.md"
 MEMORY_TABLE_NAME = "chat_memory"
 LLM_MODEL = "gpt-3.5-turbo"
 
+# ... (imports e outras seções sem alterações) ...
+
 # --- CONFIGURAÇÃO DOS AGENTES ---
 AGENTE_GERENTE_ID = "agente_gerente_v4.1"
 ESPECIALISTAS_IDS = [
@@ -23,13 +25,16 @@ ESPECIALISTAS_IDS = [
     "agente_tecnico_v2",
     "agente_arquiteto_ia_v2",
     "agente_arquiteto_web_v2",
-    "agente_qa_v2.1", # ATUALIZADO
+    "agente_qa_v2.1",
     "agente_onboarding_v2",
     "agente_lovable_prompter_v2",
     "agente_revisor_entrega_v2",
     "agente_documentador_v2",
-    "meta_agente_arquiteto_v2",
+    "meta_agente_arquiteto_v2.1", 
+    "agente_projetos_v2",
 ]
+
+# ... (o resto do código do app.py permanece exatamente o mesmo) ...
 
 
 # --- 2. CONFIGURAÇÃO DE SECRETS E SUPABASE (MEMÓRIA) ---
