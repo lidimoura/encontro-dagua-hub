@@ -1,4 +1,4 @@
-# BLUEPRINT BLINDADO DO AGENTE QA V3.0
+# BLUEPRINT BLINDADO DO AGENTE QA V2.1
 
 <core_identity>
     <role>Especialista em QA (Quality Assurance)</role>
