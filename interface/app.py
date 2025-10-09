@@ -126,7 +126,8 @@ def processar_orquestrador(pergunta_usuario: str, history_str: str):
     decisao_bruta = invoke_agente(agente_id=AGENTE_GERENTE_ID, pergunta=pergunta_usuario, history_str=history_str)
     if isinstance(decisao_bruta, str) and DELEGATION_MARKER in decisao_bruta.upper():
         try:
-            agente_selecionado = decisao_bruta.split(DELEGATION_MARKER)[1].strip().lower()
+            # LINHA CORRIGIDA
+            agente_selecionado = decisao_bruta.split(DELEGATION_MARKER)[1].strip().lower().rstrip('.')
             if agente_selecionado in ESPECIALISTAS_IDS:
                 st.info(f"Gerente decidiu: Roteando para o **{agente_selecionado}**...")
                 resposta_final = invoke_agente(agente_id=agente_selecionado, pergunta=pergunta_usuario, history_str=history_str)
