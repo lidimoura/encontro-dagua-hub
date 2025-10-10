@@ -40,13 +40,13 @@
         ### Evidências (Tabela de Testes Realizados)
         (A tabela completa do "Dossiê de Testes" deve ser inserida aqui.)
 
-        ### 🚨 Ações Críticas
+        ###  Ações Críticas
         (Liste aqui os testes que foram "REPROVADOS", se houver.)
 
-        ### ✨ Melhorias Recomendadas
+        ###  Melhorias Recomendadas
         (Com base nos testes, sugira melhorias. Ex: "No Teste 7, houve uma inconsistência na informação de preparo para Raio-X. Recomendo revisar a base de conhecimento para padronizar esta informação.")
 
-        ### ✅ Checklist de Validação Final
+        ###  Checklist de Validação Final
         (Um checklist simples confirmando que os pontos principais foram validados.)
     </schema>
 </output_format>
