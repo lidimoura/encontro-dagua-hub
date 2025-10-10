@@ -16,8 +16,6 @@ CAMINHO_DO_CONHECIMENTO = "base_conhecimento/stack_atual_v3.md"
 MEMORY_TABLE_NAME = "chat_memory"
 LLM_MODEL = "gpt-3.5-turbo"
 
-# ... (imports e outras seções sem alterações) ...
-
 # --- CONFIGURAÇÃO DOS AGENTES ---
 AGENTE_GERENTE_ID = "agente_gerente_v4.1"
 ESPECIALISTAS_IDS = [
@@ -34,11 +32,8 @@ ESPECIALISTAS_IDS = [
     "agente_projetos_v2",
 ]
 
-# ... (o resto do código do app.py permanece exatamente o mesmo) ...
-
-
 # --- 2. CONFIGURAÇÃO DE SECRETS E SUPABASE (MEMÓRIA) ---
-# ... (código do supabase sem alterações) ...
+
 @st.cache_resource
 def init_supabase_client() -> Client:
     try:
@@ -72,7 +67,6 @@ def format_history_for_llm(messages: list[dict]) -> str:
     return history_str
 
 # --- 3. CORE DE IA RAG (OpenAI/Chroma) ---
-# ... (código do RAG sem alterações) ...
 @st.cache_resource
 def carregar_vector_store():
     if not os.path.exists(CAMINHO_DO_CONHECIMENTO):
@@ -125,14 +119,12 @@ def invoke_agente(agente_id: str, pergunta: str, history_str: str = ""):
     resultado = qa_chain.invoke({"query": pergunta})
     return resultado["result"]
 
-# ... (o resto do código do app.py, que não precisa de mais alterações, continua aqui) ...
 def processar_orquestrador(pergunta_usuario: str, history_str: str):
     DELEGATION_MARKER = "DELEGAR:"
     decisao_bruta = invoke_agente(agente_id=AGENTE_GERENTE_ID, pergunta=pergunta_usuario, history_str=history_str)
     if isinstance(decisao_bruta, str) and DELEGATION_MARKER in decisao_bruta.upper():
         try:
-            # LINHA CORRIGIDA
-            agente_selecionado = decisao_bruta.split(DELEGATION_MARKER)[1].strip().lower().rstrip('.')
+            agente_selecionado = decisao_bruta.split(DELEGATION_MARKER)[1].strip().split()[0].lower().rstrip('.')
             if agente_selecionado in ESPECIALISTAS_IDS:
                 st.info(f"Gerente decidiu: Roteando para o **{agente_selecionado}**...")
                 resposta_final = invoke_agente(agente_id=agente_selecionado, pergunta=pergunta_usuario, history_str=history_str)
