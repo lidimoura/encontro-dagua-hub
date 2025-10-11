@@ -14,7 +14,7 @@ from langchain.prompts import PromptTemplate
 # --- 1. CONFIGURAÇÃO GERAL DO HUB ---
 CAMINHO_DO_CONHECIMENTO = "base_conhecimento/stack_atual_v3.md"
 MEMORY_TABLE_NAME = "chat_memory"
-LLM_MODEL = "gpt-3.5-turbo"
+LLM_MODEL =  "gpt-4o-mini"
 
 # ... (imports e outras seções sem alterações) ...
 
