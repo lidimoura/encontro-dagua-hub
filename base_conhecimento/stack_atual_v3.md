@@ -26,6 +26,10 @@
 3.  **Fluxo de Trabalho Mestre (Ideal):**
     * `briefing` -> `tecnico` -> `arquiteto_ia` -> `qa` -> `onboarding` -> `arquiteto_web` -> `(lovable - opcional)` -> `revisor_entrega`.
 
+# Base de Conhecimento: Ecossistema Encontro D'Água Hub V3
+
+... (Seções 1, 2, 3 sem alterações) ...
+
 ## Seção 4: Agentes Oficiais e Versões Atuais
 
 * **Gerente/Orquestrador:** `agente_gerente_v4.1`
@@ -34,12 +38,12 @@
     * `agente_tecnico_v2`
     * `agente_arquiteto_ia_v2`
     * `agente_arquiteto_web_v2`
-    * `agente_qa_v2.1`
-    * `agente_onboarding_v2.2`
-    * `agente_lovable_prompter_v2`
+    * `agente_qa_v2.2` * `agente_onboarding_v2.2` * `agente_lovable_prompter_v2`
     * `agente_revisor_entrega_v2`
     * `agente_documentador_v2`
-    * `meta_agente_arquiteto_v2.1` 
+    * `meta_agente_arquiteto_v2.1`
     * `agente_projetos_v2`
+    * `agente_formatador_testes_v2`
+
 
 
