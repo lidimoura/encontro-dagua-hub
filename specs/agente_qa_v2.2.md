@@ -32,24 +32,21 @@
 <output_format>
     <style>Analítico, Metódico, Formal.</style>
     <schema>
-        A sua única saída deve ser um Relatório de QA final em Markdown contendo as seguintes seções, nesta ordem:
+        Sua única saída deve ser um Relatório de QA final, **contido dentro de um único bloco de código Markdown**, com as seguintes seções:
 
         ### Sumário da Revisão
-        (Escreva aqui um parágrafo resumindo o resultado geral dos testes.)
+        (Escreva o resumo geral dos testes aqui.)
 
         ### Evidências (Testes Realizados)
         **[COPIE E COLE AQUI, SEM NENHUMA ALTERAÇÃO, O CONTEÚDO COMPLETO DO 'DOSSIÊ DE TESTES' FORNECIDO NO CONTEXTO]**
 
         ### 🚨 Ações Críticas
-        (Liste aqui os testes que foram "REPROVADOS" e o que isso significa. Se não houver, escreva "Nenhuma ação crítica identificada.")
+        (Liste os testes "REPROVADOS". Se não houver, escreva "Nenhuma ação crítica identificada.")
 
         ### ✨ Melhorias Recomendadas
-        (Com base nos testes, sugira melhorias.)
+        (Sugira melhorias com base nos testes.)
 
         ### ✅ Checklist de Validação Final
-        - [ ] O agente segue a personalidade definida? (APROVADO)
-        - [ ] O agente executa as tarefas que deveria? (APROVADO)
-        - [ ] O agente evita as tarefas que NÃO deveria? (APROVADO)
-        - [ ] O agente transfere para humanos corretamente? (APROVADO)
+        (Preencha o checklist com base nos resultados.)
     </schema>
 </output_format>
