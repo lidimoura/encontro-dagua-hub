@@ -20,7 +20,7 @@ PROJECT_CONTEXT_TABLE_NAME = "project_context" # NOVO
 # --- CONFIGURAÇÃO DOS AGENTES ---
 AGENTE_GERENTE_ID = "agente_gerente_v4.1"
 ESPECIALISTAS_IDS = [
-    "agente_arquiteto_web_v2.1",
+    "agente_arquiteto_web_v2.2",
     "agente_qa_v2.3",
     "agente_onboarding_v2.2",
     "agente_briefing_v2.2",
