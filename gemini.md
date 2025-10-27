@@ -115,6 +115,22 @@ Este capítulo registra as últimas correções de versionamento e lógica de Ag
 
 O Hub está oficialmente lançado na arquitetura "Tudo-em-Um" e pronto para a produção.
 
+---
+**Data:** 26/10/2025 (Ref. Protocolo v7.0)
+**Contexto:** Reparo e Sincronização do Repositório Git.
+**Arquiteta:** Lidi Moura
+**Copiloto:** GEM
+
+**Log de Mudanças:**
+
+* **Problema Identificado:** O repositório local estava dessincronizado do GitHub. Tentativas de merge entre `main` e `develop` falharam devido a conflitos e interferência de processos externos (OneDrive), travando o repositório (`.git/index.lock` e `Deletion failed`).
+* **Protocolo de Reparo (v7.0) Executado:**
+    1.  O merge falho foi abortado (`git merge --abort`).
+    2.  A `main` local foi forçada a se tornar idêntica à `origin/develop` (`git reset --hard origin/develop`).
+    3.  A nova `main` (agora contendo o código da `develop`) foi forçada para o GitHub (`git push origin main --force`).
+* **Resultado:** `main` e `develop` estão 100% unificadas. O código local da Arquiteta foi preservado.
+* **Próximo Passo (Infra):** Criação de 3 branches de experimento (`exp/ui-lovable`, `exp/ui-bolt`, `exp/ui-googleai`) para o "bake-off" de geração de UI.
+
 
 
 
