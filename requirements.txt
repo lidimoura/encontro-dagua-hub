@@ -1,5 +1,9 @@
+# Módulo de UI
+streamlit
+
 # Módulos Core do Hub (LLM e Memória)
 openai
+langchain  # <-- CORREÇÃO: Adicionada a biblioteca base
 langchain-openai
 
 # CORRIGIDO: Nome correto da biblioteca Supabase
@@ -11,4 +15,3 @@ langchain-community
 
 # CORREÇÃO FINAL: Instalar o Unstructured com a dependência para Markdown (necessária para ler o .md)
 unstructured[md]
-
