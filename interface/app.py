@@ -30,7 +30,7 @@ Typebot.initBubble({{
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_community.document_loaders import UnstructuredFileLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter # <--- LINHA 31
+from langchain_text_splitters import RecursiveCharacterTextSplitter 
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
