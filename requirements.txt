@@ -3,15 +3,18 @@ streamlit
 
 # Módulos Core do Hub (LLM e Memória)
 openai
-langchain  # <-- CORREÇÃO: Adicionada a biblioteca base
+langchain
 langchain-openai
 
-# CORRIGIDO: Nome correto da biblioteca Supabase
+# Módulo de Banco de Dados
 supabase
 
 # Módulos do RAG
 chromadb
 langchain-community
 
-# CORREÇÃO FINAL: Instalar o Unstructured com a dependência para Markdown (necessária para ler o .md)
+# Módulo de Leitura de Documentos
 unstructured[md]
+
+# CORREÇÃO: Pacote que agora contém o RecursiveCharacterTextSplitter
+langchain-text-splitters
