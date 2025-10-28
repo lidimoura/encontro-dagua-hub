@@ -6,9 +6,10 @@ import streamlit.components.v1 as components  # Importante: para injetar o Typeb
 
 # --- 1. SCRIPT DA AMAZO (TYPEBOT) ---
 # Envolvemos seu script HTML em uma string Python
+# CORRIGIDO: URLs com "https://" para evitar erros de conteúdo misto
 TYPEBOT_SCRIPT_HTML = f"""
 <script type="module">
-import Typebot from 'https_cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js'
+import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js'
 
 Typebot.initBubble({{
   typebot: "amazo-chatbot-landingpage",
@@ -16,7 +17,7 @@ Typebot.initBubble({{
     button: {{
       backgroundColor: "#1D1D1D",
       customIconSrc:
-        "https_s3.typebot.io/public/workspaces/cmcppn5am0002jx04z0h8go9a/typebots/e3xutbhw5sjveknrxmmwgq7m/bubble-icon?v=1761597459125",
+        "https://s3.typebot.io/public/workspaces/cmcppn5am0002jx04z0h8go9a/typebots/e3xutbhw5sjveknrxmmwgq7m/bubble-icon?v=1761597459125",
     }},
     chatWindow: {{ backgroundColor: "#f1f1f1" }},
   }},
@@ -25,10 +26,11 @@ Typebot.initBubble({{
 """
 
 # --- 2. IMPORTS DA STACK DE IA ---
+# (O erro estava aqui, pois 'langchain' não estava no requirements.txt)
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_community.document_loaders import UnstructuredFileLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter # <--- LINHA 31
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
@@ -56,7 +58,8 @@ def init_supabase_client() -> Client:
         key: str = st.secrets["SUPABASE_KEY"]
         return create_client(url, key)
     except Exception as e:
-        st.error(f"Erro ao conectar com Supabase: {e}")
+        # Não usamos st.error aqui para não poluir a landing page
+        print(f"Erro ao conectar com Supabase: {e}")
         return None
 supabase: Client = init_supabase_client()
 
@@ -102,7 +105,7 @@ def format_history_for_llm(messages: list[dict]) -> str:
 @st.cache_resource
 def carregar_vector_store():
     if not os.path.exists(CAMINHO_DO_CONHECIMENTO):
-        st.error(f"Arquivo de conhecimento não encontrado: {CAMINHO_DO_CONHECIMENTO}")
+        print(f"Arquivo de conhecimento não encontrado: {CAMINHO_DO_CONHECIMENTO}")
         return None
     try:
         loader = UnstructuredFileLoader(CAMINHO_DO_CONHECIMENTO)
@@ -113,7 +116,7 @@ def carregar_vector_store():
         vector_store = Chroma.from_documents(documents=chunks, embedding=embeddings)
         return vector_store
     except Exception as e:
-        st.error(f"Erro ao carregar o RAG: {e}")
+        print(f"Erro ao carregar o RAG: {e}")
         return None
 vector_store = carregar_vector_store()
 retriever = vector_store.as_retriever() if vector_store else None
@@ -196,13 +199,11 @@ def showcase_publico():
     """)
     
     # INJETANDO O SCRIPT DO TYPEBOT
-    # (Corrigi as URLs para HTTPS para evitar erros de conteúdo misto)
-    typebot_script_corrigido = TYPEBOT_SCRIPT_HTML.replace("https_cdn.jsdelivr.net", "https://cdn.jsdelivr.net").replace("https_s3.typebot.io", "https://s3.typebot.io")
-    components.html(typebot_script_corrigido, height=700)
+    components.html(TYPEBOT_SCRIPT_HTML, height=700)
     
     st.divider()
     st.markdown("O código-fonte deste Hub (Monorepo) está disponível [aqui](https://github.com/lidimoura/encontro-dagua-hub).")
-    st.markdown("Para projetos ou consultorias, agende um horário [via Buy Me a Coffee]([SEU_LINK_BMAC_AQUI]).")
+    st.markdown("Para projetos ou consultorias, agende um horário [via Buy Me a Coffee](https://www.buymeacoffee.com/lidimoura).") # <--- ADICIONE SEU LINK DO BMAC
 
 
 def painel_de_controle():
