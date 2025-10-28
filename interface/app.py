@@ -2,8 +2,29 @@ import streamlit as st
 import os
 import uuid
 from supabase import create_client, Client
+import streamlit.components.v1 as components  # Importante: para injetar o Typebot
 
-# IMPORTS DA STACK DE IA
+# --- 1. SCRIPT DA AMAZO (TYPEBOT) ---
+# Envolvemos seu script HTML em uma string Python
+TYPEBOT_SCRIPT_HTML = f"""
+<script type="module">
+import Typebot from 'https_cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js'
+
+Typebot.initBubble({{
+  typebot: "amazo-chatbot-landingpage",
+  theme: {{
+    button: {{
+      backgroundColor: "#1D1D1D",
+      customIconSrc:
+        "https_s3.typebot.io/public/workspaces/cmcppn5am0002jx04z0h8go9a/typebots/e3xutbhw5sjveknrxmmwgq7m/bubble-icon?v=1761597459125",
+    }},
+    chatWindow: {{ backgroundColor: "#f1f1f1" }},
+  }},
+}});
+</script>
+"""
+
+# --- 2. IMPORTS DA STACK DE IA ---
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_community.document_loaders import UnstructuredFileLoader
@@ -11,30 +32,23 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
-# --- 1. CONFIGURAÇÃO GERAL DO HUB ---
+# --- 3. CONFIGURAÇÃO GERAL DO HUB ---
 CAMINHO_DO_CONHECIMENTO = "base_conhecimento/stack_atual_v3.md"
 MEMORY_TABLE_NAME = "chat_memory"
 LLM_MODEL = "gpt-4o-mini"
-PROJECT_CONTEXT_TABLE_NAME = "project_context" # NOVO
+PROJECT_CONTEXT_TABLE_NAME = "project_context"
 
 # --- CONFIGURAÇÃO DOS AGENTES ---
 AGENTE_GERENTE_ID = "agente_gerente_v4.1"
 ESPECIALISTAS_IDS = [
-    "agente_arquiteto_web_v2.2",
-    "agente_qa_v2.3",
-    "agente_onboarding_v2.2",
-    "agente_briefing_v2.2",
-    "agente_tecnico_v2",
-    "agente_arquiteto_ia_v2",
-    "agente_lovable_prompter_v2",
-    "agente_revisor_entrega_v2",
-    "agente_documentador_v2",
-    "meta_agente_arquiteto_v2.1",
-    "agente_projetos_v2",
-    "agente_formatador_testes_v2",
+    "agente_arquiteto_web_v2.2", "agente_qa_v2.3", "agente_onboarding_v2.2",
+    "agente_briefing_v2.2", "agente_tecnico_v2", "agente_arquiteto_ia_v2",
+    "agente_lovable_prompter_v2", "agente_revisor_entrega_v2",
+    "agente_documentador_v2", "meta_agente_arquiteto_v2.1",
+    "agente_projetos_v2", "agente_formatador_testes_v2",
 ]
 
-# --- 2. CONFIGURAÇÃO DE SECRETS E SUPABASE ---
+# --- 4. CONFIGURAÇÃO DE SECRETS E SUPABASE ---
 @st.cache_resource
 def init_supabase_client() -> Client:
     try:
@@ -67,7 +81,6 @@ def add_message_to_history(session_id: str, role: str, content: str):
         data = {"session_id": session_id, "role": role, "content": content}
         supabase.table(MEMORY_TABLE_NAME).insert(data).execute()
 
-# NOVO: Função para buscar o contexto de longo prazo do projeto
 def get_project_context(project_id: str) -> dict:
     if supabase and project_id:
         try:
@@ -85,7 +98,7 @@ def format_history_for_llm(messages: list[dict]) -> str:
         elif msg["role"] == "assistant": history_str += f"ASSISTENTE: {content}\n"
     return history_str
 
-# --- 3. CORE DE IA RAG ---
+# --- 5. CORE DE IA RAG ---
 @st.cache_resource
 def carregar_vector_store():
     if not os.path.exists(CAMINHO_DO_CONHECIMENTO):
@@ -106,7 +119,7 @@ vector_store = carregar_vector_store()
 retriever = vector_store.as_retriever() if vector_store else None
 llm = ChatOpenAI(model=LLM_MODEL, temperature=0.5)
 
-# --- 4. LÓGICA DE INVOCAÇÃO DOS AGENTES ---
+# --- 6. LÓGICA DE INVOCAÇÃO DOS AGENTES ---
 def invoke_agente(agente_id: str, pergunta: str, history_str: str = ""):
     if not retriever:
         return "Erro: Sistema de conhecimento (RAG) não inicializado."
@@ -118,7 +131,6 @@ def invoke_agente(agente_id: str, pergunta: str, history_str: str = ""):
     except FileNotFoundError:
         return f"Erro: Agente com ID '{agente_id}' não encontrado em {caminho_do_dna}."
 
-    # ATUALIZADO: Lógica para injetar o contexto do projeto
     project_context_str = ""
     if "project_context" in st.session_state and st.session_state["project_context"]:
         project_context_str += "\n\n--- CONTEXTO GERAL DO PROJETO (MEMÓRIA DE LONGO PRAZO) ---\n"
@@ -158,15 +170,46 @@ def processar_orquestrador(pergunta_usuario: str, history_str: str):
     else:
         return decisao_bruta, AGENTE_GERENTE_ID
 
-# --- 5. LOOP PRINCIPAL DO STREAMLIT (INTERFACE) ---
 def formatar_nome_agente_para_exibicao(agente_id: str) -> str:
     if agente_id == AGENTE_GERENTE_ID:
         return "Gerente Padrão (Guia)"
     return agente_id.replace("agente_", "").replace("_", " ").split(' v')[0].title()
 
-def chat_interface():
-    st.set_page_config(page_title="🌀 Encontro D'Água Hub", layout="wide")
-    st.title("🌀 Encontro D'Água Hub - Orquestrador de Soluções")
+# --- 7. NOVAS VIEWS (PÚBLICA E PRIVADA) ---
+
+def showcase_publico():
+    """
+    Esta é a nova Landing Page / Showcase pública.
+    """
+    st.title("Bem-vindo ao 🌀 Encontro D'Água Hub")
+    st.subheader("Ecossistema de Soluções de IA, por Lidi Moura")
+    st.markdown("""
+        Eu sou a Amazo, a Agente de CS deste Hub. 
+        Estou aqui para entender suas necessidades e te direcionar para a solução correta.
+
+        **Como posso te ajudar hoje?**
+        * Gostaria de saber mais sobre a **Metodologia de 4 Etapas** da Arquiteta Lidi?
+        * Quer agendar uma **Consultoria de Capacitação em IA**?
+        * Deseja saber mais sobre nosso **Modelo de Impacto Social**?
+
+        Converse comigo abaixo!
+    """)
+    
+    # INJETANDO O SCRIPT DO TYPEBOT
+    # (Corrigi as URLs para HTTPS para evitar erros de conteúdo misto)
+    typebot_script_corrigido = TYPEBOT_SCRIPT_HTML.replace("https_cdn.jsdelivr.net", "https://cdn.jsdelivr.net").replace("https_s3.typebot.io", "https://s3.typebot.io")
+    components.html(typebot_script_corrigido, height=700)
+    
+    st.divider()
+    st.markdown("O código-fonte deste Hub (Monorepo) está disponível [aqui](https://github.com/lidimoura/encontro-dagua-hub).")
+    st.markdown("Para projetos ou consultorias, agende um horário [via Buy Me a Coffee]([SEU_LINK_BMAC_AQUI]).")
+
+
+def painel_de_controle():
+    """
+    Esta é a sua interface de Arquiteta (o app antigo).
+    """
+    st.title("🌀 Painel de Controle (Arquiteta)")
     
     if not supabase or not vector_store:
         st.error("O Hub não pôde inicializar. Verifique conexões.")
@@ -176,7 +219,6 @@ def chat_interface():
         st.subheader("Controles do Hub (Arquiteta)")
         st.write(f"ID da Sessão: `{current_session_id[:8]}...`")
 
-        # NOVO: Painel para carregar o Contexto do Projeto
         st.subheader("Memória de Projeto")
         project_id_input = st.text_input(
             "ID do Projeto Ativo:", 
@@ -209,12 +251,13 @@ def chat_interface():
                 supabase.table(MEMORY_TABLE_NAME).delete().eq("session_id", current_session_id).execute()
                 st.rerun()
 
+    # Loop do Chat (Painel de Controle)
     raw_history = get_chat_history(current_session_id)
     for message in raw_history:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    if prompt := st.chat_input("Pergunte ao Hub..."):
+    if prompt := st.chat_input("Pergunte ao Hub (Arquiteta)..."):
         history_for_llm = format_history_for_llm(raw_history)
         add_message_to_history(current_session_id, "user", prompt)
         
@@ -234,5 +277,29 @@ def chat_interface():
         
         st.rerun()
 
+# --- 8. LOOP PRINCIPAL (CONTROLE DE ACESSO) ---
+def main():
+    st.set_page_config(page_title="🌀 Encontro D'Água Hub", layout="wide")
+
+    # Verifica se a senha está nos secrets
+    if "APP_PASSWORD" not in st.secrets:
+        st.error("A senha de acesso do app não foi configurada nos Secrets do Streamlit.")
+        st.info("A visão pública será exibida.")
+        showcase_publico()
+        return
+
+    # Lógica de Autenticação na Sidebar
+    st.sidebar.title("Acesso ao Hub")
+    password_input = st.sidebar.text_input("Senha de Arquiteta:", type="password")
+    
+    if password_input == st.secrets["APP_PASSWORD"]:
+        # Se a senha estiver correta, mostra o Painel de Controle
+        painel_de_controle()
+    else:
+        # Se a senha estiver errada ou não for inserida, mostra a Landing Page
+        if password_input and password_input != st.secrets["APP_PASSWORD"]:
+            st.sidebar.error("Senha incorreta.")
+        showcase_publico()
+
 if __name__ == "__main__":
-    chat_interface()
+    main()
