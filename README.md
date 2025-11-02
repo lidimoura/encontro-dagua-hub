@@ -35,7 +35,7 @@ Em um mundo digital que cresce exponencialmente, o Encontro D'Água Hub nasce co
 
 Nossa missão é desenvolver soluções que não apenas automatizam e otimizam processos, mas o fazem com responsabilidade ambiental e social, criando um ecossistema digital sustentável.
 
-## 🏗️ Arquitetura do Hub
+## Arquitetura do Hub
 
 O projeto utiliza uma arquitetura "Tudo-em-Um" (Streamlit Híbrido), com duas interfaces principais:
 
@@ -49,7 +49,7 @@ O projeto utiliza uma arquitetura "Tudo-em-Um" (Streamlit Híbrido), com duas in
    - Orquestrador de agentes
    - Acesso protegido por senha (`APP_PASSWORD`)
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 <div align="center">
 
@@ -64,7 +64,7 @@ O projeto utiliza uma arquitetura "Tudo-em-Um" (Streamlit Híbrido), com duas in
 
 </div>
 
-## 📁 Estrutura do Repositório
+## Estrutura do Repositório
 
 ```bash
 encontro-dagua-hub/
@@ -78,7 +78,7 @@ encontro-dagua-hub/
 └── 📄 LICENSE
 ```
 
-## 🚀 Como Começar
+## Como Começar
 
 O projeto está **ATIVO** e em execução no Streamlit Cloud. Para desenvolvimento local:
 
@@ -97,15 +97,15 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-## 🤝 Contribuição
+## Contribuição
 
 Estamos em fase inicial de desenvolvimento. Em breve, disponibilizaremos guias detalhados para contribuição. Se você se identifica com nossa missão de tecnologia sustentável, fique atento às atualizações.
 
-## 📜 Licença
+## Licença
 
 Este projeto está licenciado sob a [Licença MIT](LICENSE).
 
-## 📫 Contato
+## Contato
 
 <div align="center">
 
