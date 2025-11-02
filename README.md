@@ -29,7 +29,7 @@ Onde tecnologia e sustentabilidade se encontram. Este repositório é o coraçã
     <a href="#-contato">Contato</a>
 </p>
 
-## 💡 Sobre o Projeto
+## Sobre o Projeto
 
 Em um mundo digital que cresce exponencialmente, o Encontro D'Água Hub nasce com um propósito: criar tecnologia de forma sustentável. Inspirado no encontro das águas dos rios Negro e Solimões em Manaus, este projeto representa a convergência harmoniosa entre inovação tecnológica e consciência ambiental.
 
