@@ -35,19 +35,14 @@ Em um mundo digital que cresce exponencialmente, o Encontro D'Água Hub nasce co
 
 Nossa missão é desenvolver soluções que não apenas automatizam e otimizam processos, mas o fazem com responsabilidade ambiental e social, criando um ecossistema digital sustentável.
 
-## Arquitetura do Hub
+## Arquitetura do Hub (Em Evolução)
 
-O projeto utiliza uma arquitetura "Tudo-em-Um" (Streamlit Híbrido), com duas interfaces principais:
+Inicialmente construído em uma arquitetura "Tudo-em-Um" (Streamlit Híbrido), o Hub está **atualmente em processo de refatoração** para um ecossistema mais robusto e escalável.
 
-1. **Visão Pública (Showcase)**
-   - Landing Page intuitiva
-   - Integração com Bubble da Amazo (Typebot)
-   - Acesso público sem necessidade de autenticação
-
-2. **Visão Privada (Painel)**
-   - Painel de Controle da Arquiteta
-   - Orquestrador de agentes
-   - Acesso protegido por senha (`APP_PASSWORD`)
+A nova arquitetura desacoplada inclui:
+* **`FastAPI`**: Para servir os Agentes de IA e a lógica de negócios como um backend dedicado.
+* **`n8n` (Self-Hosted)**: Para orquestrar automações complexas e fluxos de trabalho.
+* **`Streamlit`**: Mantido como a interface principal para o Painel de Controle e visualização de dados.
 
 ## Tecnologias Utilizadas
 
