@@ -50,12 +50,14 @@ A nova arquitetura desacoplada inclui:
 
 | Categoria | Tecnologia | Descrição |
 |-----------|------------|-----------|
-| **Core** | ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) | Linguagem principal |
-| **Frontend** | ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white) | Interface do usuário |
-| **IA** | ![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white) | GPT-4o-Mini |
-| **Database** | ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white) | Armazenamento e cache |
-| **RAG** | ![LangChain](https://img.shields.io/badge/LangChain-020202?style=for-the-badge&logo=langchain&logoColor=white) | Orquestração |
-| **Deploy** | ![Streamlit Cloud](https://img.shields.io/badge/Streamlit_Cloud-0D0D0D?style=for-the-badge&logo=streamlit&logoColor=white) | Hospedagem |
+| **Linguagem Core** | ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) | Linguagem principal |
+| **Backend API** | ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white) | API para os Agentes |
+| **Automação** | ![n8n](https://img.shields.io/badge/n8n-1A1A1A?style=for-the-badge&logo=n8n&logoColor=white) | Orquestração de workflows |
+| **Frontend** | ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white) | Interface do Painel |
+| **IA (Multi-API)** | ![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white) ![Gemini](https://img.shields.io/badge/Gemini-8E8E8E?style=for-the-badge&logo=google&logoColor=white) ![Claude](https://img.shields.io/badge/Claude-D97A3A?style=for-the-badge&logo=anthropic&logoColor=white) | GPT-4o-Mini, Gemini & Claude |
+| **Database** | ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white) | Armazenamento e Vetorização |
+| **RAG** | ![LangChain](https://img.shields.io/badge/LangChain-020202?style=for-the-badge&logo=langchain&logoColor=white) ![ChromaDB](https://img.shields.io/badge/Chroma-555555?style=for-the-badge&logo=chroma&logoColor=white) | Orquestração e VectorDB |
+| **Deploy** | ![Streamlit Cloud](https://img.shields.io/badge/Streamlit_Cloud-0D0D0D?style=for-the-badge&logo=streamlit&logoColor=white) | Hospedagem (Atual) |
 
 </div>
 
